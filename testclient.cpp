@@ -12,17 +12,19 @@
 using namespace std;
 
 string receive_fifo = "status";
-	string send_fifo = "nextMove";
+string send_fifo = "nextMove";
 	
-// create the FIFOs for communication
-Fifo recfifo(receive_fifo);
-Fifo sendfifo(send_fifo);
+
 
 int main() {
 
 string player1, player2, message;
 
   while (1) {
+	  
+	// create the FIFOs for communication
+	Fifo recfifo(receive_fifo);
+	Fifo sendfifo(send_fifo);
 
 	cout << "Enter player 1 name:";
 	cin >> player1;
