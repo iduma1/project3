@@ -13,8 +13,8 @@ using namespace std;
 
 string receive_fifo = "status";
 string send_fifo = "nextMove";
-	
-//Testing testing 123
+
+//Another test
 
 int main() {
 
