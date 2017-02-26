@@ -14,9 +14,13 @@ using namespace std;
 string receive_fifo = "status";
 string send_fifo = "nextMove";
 
+<<<<<<< HEAD
 // create the FIFOs for communication
 Fifo recfifo(receive_fifo);
 Fifo sendfifo(send_fifo);
+=======
+//Testing one more time
+>>>>>>> c559898542df7f40ec8b3650d834d84cf8ea573f
 
 int main() {
 	string player1, player2, message;
