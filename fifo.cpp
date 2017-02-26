@@ -1,4 +1,4 @@
-    /***************************************************************************
+/***************************************************************************
  fifo.cpp  -  code to allow interprocess communication via a fifo, or "names pipe"
  *
 * copyright : (C) 2009 by Jim Skon
@@ -21,7 +21,9 @@ Fifo::Fifo(){
 Fifo::Fifo(string name){
   // create a named pipe (FIFO)
   // build the name string
-  pipename = PATH + SIG + name;
+  string path = PATH;
+  string sig = SIG;
+  pipename = path + sig + name;
 
   umask(0);
   // Create (or open) the fifo
@@ -43,16 +45,16 @@ void Fifo::openwrite() {
     return;
   }
   // Open the pipe
-  fd = open(pipename.c_str(),O_RDONLY);
+  fd = open(pipename.c_str(),O_WRONLY);
 
   // Check if open succeeded
   if (fd ==-1) {
 	cout << "Error - bad input pipe: " << pipename << endl;
 	return;
   }
-}
 
-  void Fifo::openread() {
+}
+void Fifo::openread() {
   if (fd !=0) {
     cout << "Fifo already opened: " << pipename << endl;
     return;
@@ -66,7 +68,7 @@ void Fifo::openwrite() {
 	return;
   }
 }
-
+  
 void Fifo::fifoclose() {
   close(fd);
   fd = 0;

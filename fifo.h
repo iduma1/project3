@@ -24,15 +24,14 @@
 #include <stdio.h>
 #include <string.h>
 
-
-using namespace std;
-
 #define MaxMess 200
-const string PATH  = "/tmp/";
-// SIGniture assures the pipe is unique amoung users
-const string SIG = "iduma1_";
 #define MODE 0777
 #define MESSTERM '\n'
+#define PATH "/tmp/"
+  // SIGniture assures the pipe is unique amoung users
+#define SIG "iduma1_";
+
+using namespace std;
 
 class Fifo {
 
@@ -40,7 +39,7 @@ class Fifo {
 
   int fd;   // File descriptor for pipes
   string pipename;
-
+  
  public:
   // create a named pipe (FIFO)
   Fifo();

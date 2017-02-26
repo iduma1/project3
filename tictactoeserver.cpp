@@ -34,30 +34,35 @@ int main() {
 	while (1) {
 		switch (current) {
 			case noPlayer:	current = noPlayerFn(player1Name);
+				break;
 			case onePlayer: current = onePlayerFn(player2Name);
-			case twoPlayer: cout << "Both players connecteD!" << endl;
+				break;
+			case twoPlayer: //cout << "Both players connecteD!" << endl;
+				break;
 		}
 	}
 	return 0;
 }
 
 state noPlayerFn(string& player1Name) {
-	cout << "No players connected";
-	sendfifo.openwrite();//Blocks out others
+	cout << "No players connected" << endl;
+	//sendfifo.openwrite();//Blocks out others
+	//cout << "open send fifo" << endl;
 	recfifo.openread();//Opens rec fifo
+	cout << "waiting ... " << endl;
 	player1Name = recfifo.recv();//stores player 1 name
-	cout << "Message received--player 1's name is: " << player1Name;
+	cout << "Message received--player 1's name is: " << player1Name << endl;
 	recfifo.fifoclose();
-	sendfifo.fifoclose();
+	//sendfifo.fifoclose();
 	return onePlayer;
 }
 
 state onePlayerFn(string& player2Name) {
-	sendfifo.openwrite();
+	//sendfifo.openwrite();
 	recfifo.openread();
 	player2Name = recfifo.recv();
-	cout << "Message received--player 2's name is: " << player2Name;
+	cout << "Message received--player 2's name is: " << player2Name << endl;
 	recfifo.fifoclose();
-	sendfifo.fifoclose();
+	//sendfifo.fifoclose();
 	return twoPlayer;
 }
