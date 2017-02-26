@@ -8,6 +8,7 @@
 #include <fstream>
 #include <vector>
 #include <algorithm>
+#include <string>
 #include "fifo.h"
 
 using namespace std;
@@ -20,24 +21,36 @@ string send_fifo = "status";
 Fifo recfifo(receive_fifo);
 Fifo sendfifo(send_fifo);
 
-enum state {noPlayer, onePlayer, twoPlayer, startPlay};
+enum state {noPlayer, onePlayer, player1Turn, player1Loss, player2Loss};
 
 state noPlayerFn(string& player1Name);
 
 state onePlayerFn(string& player2Name);
 
+state player1TurnFn(string& pos);
+
+state player1LossFn();
+
+state player2LossFn();
+
 int main() {
 	state current;
 	current = noPlayer;
 	string player1Name, player2Name;
+	string pos;
 	cout << "Waiting for people to connect..." << endl;
 	while (1) {
 		switch (current) {
 			case noPlayer:	current = noPlayerFn(player1Name);
 				break;
 			case onePlayer: current = onePlayerFn(player2Name);
+							cout << "Both players connected!" << endl;
 				break;
-			case twoPlayer: //cout << "Both players connecteD!" << endl;
+			case player1Turn: current = player1TurnFn(pos);
+				break;
+			case player1Loss: current = player1LossFn();
+				break;
+			case player2Loss: current = player2LossFn();
 				break;
 		}
 	}
@@ -49,7 +62,6 @@ state noPlayerFn(string& player1Name) {
 	//sendfifo.openwrite();//Blocks out others
 	//cout << "open send fifo" << endl;
 	recfifo.openread();//Opens rec fifo
-	cout << "waiting ... " << endl;
 	player1Name = recfifo.recv();//stores player 1 name
 	cout << "Message received--player 1's name is: " << player1Name << endl;
 	recfifo.fifoclose();
@@ -64,5 +76,24 @@ state onePlayerFn(string& player2Name) {
 	cout << "Message received--player 2's name is: " << player2Name << endl;
 	recfifo.fifoclose();
 	//sendfifo.fifoclose();
-	return twoPlayer;
+	return player1Turn;
+}
+
+state player1TurnFn(string& pos) {
+	recfifo.openread();
+	pos = recfifo.recv();
+	cout << "Pos is: " << pos << endl;
+	recfifo.fifoclose();	
+	return player1Loss;
+	
+}
+
+state player1LossFn() {
+	cout << "Player 1 lost!" << endl;
+	return noPlayer;
+}
+
+state player2LossFn() {
+	cout << "Player 2 lost!" << endl;
+	return noPlayer;
 }
