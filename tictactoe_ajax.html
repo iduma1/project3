@@ -1,0 +1,74 @@
+<html>
+<head>
+<title>Software Development - U.S. Census Name Data Demo Program</title>
+<META AUTHOR="Jim Skon">
+</head>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+<head>
+  <!-- $Id: name_stats_ajax.html,v 1.6 skon Exp $ -->
+<link rel="stylesheet" type="text/css" href="index_ajax.css">
+  <title>GNU cgicc Name Data Form</title>
+</head>
+
+<script type = "text/javascript">
+var XMLHttp;
+if(navigator.appName == "Microsoft Internet Explorer") {
+    XMLHttp = new ActiveXObject("Microsoft.XMLHTTP");
+} else {
+    XMLHttp = new XMLHttpRequest();
+}
+
+function getresponse () {
+
+     var name = document.getElementById('name').value;		     
+     if (name.length < 1) return;
+
+    XMLHttp.open("GET", "/cgi-bin/solorioc_indexsearchajax.cgi?"
+						 + "&name=" + name
+						 ,true);
+    XMLHttp.onreadystatechange=function() {
+
+    document.getElementById('response_area').innerHTML = 
+XMLHttp.responseText;
+
+    }
+	XMLHttp.send(null);
+}
+
+</script>
+
+<body>
+
+<div id="intro">
+<h1>Software Development - Index of Shakespeare's Complete Works</h1>
+<p>This program is designed to demonstrate a simple client/server program. 
+A server program runs in the background, waiting for a search requests.  When it receives a search request
+it returns the lines that contain the searched word. 
+<p>  The reason for such a architecture is to allow a simple program, with a MAP preloaded with data,
+to quickly provide results without incurring the overhead of a reloading the texts for each request. 
+<br> (Written by Jim Skon, Modified by Christian Solorio)
+</div>
+
+<p>
+<hr>
+Word to search for:  
+<input name="name" type="text" id=name maxlength=30></td>
+<p>
+
+<input type="button" onclick="javascript: getresponse ()" name="submit" value="Submit" />
+</p>
+
+<div id = "response_area">
+
+</div>
+
+
+
+</body>
+</html>
+
+
+
+
+
