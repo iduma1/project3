@@ -21,23 +21,24 @@ string send_fifo = "status";
 Fifo recfifo(receive_fifo);
 Fifo sendfifo(send_fifo);
 
-enum state {noPlayer, onePlayer, player1Turn, player1Loss, player2Loss};
+enum state {noPlayer, onePlayer, player1Turn, player2Turn, player1Win, player2Win};
 
+/* State machine functions */
 state noPlayerFn(string& player1Name);
-
 state onePlayerFn(string& player2Name);
-
 state player1TurnFn(string& pos);
-
-state player1LossFn();
-
-state player2LossFn();
+state player2TurnFn(string& pos);
+state player1WinFn(int& player1Wins);
+state player2WinFn(int& player2Wins);
 
 int main() {
+		
 	state current;
 	current = noPlayer;
 	string player1Name, player2Name;
 	string pos;
+	int player1Wins, player2Wins;
+	
 	cout << "Waiting for people to connect..." << endl;
 	while (1) {
 		switch (current) {
@@ -48,9 +49,11 @@ int main() {
 				break;
 			case player1Turn: current = player1TurnFn(pos);
 				break;
-			case player1Loss: current = player1LossFn();
+			case player2Turn: current = player2TurnFn(pos);
 				break;
-			case player2Loss: current = player2LossFn();
+			case player1Win: current = player1WinFn(player1Wins);
+				break;
+			case player2Win: current = player2WinFn(player2Wins);
 				break;
 		}
 	}
@@ -82,18 +85,37 @@ state onePlayerFn(string& player2Name) {
 state player1TurnFn(string& pos) {
 	recfifo.openread();
 	pos = recfifo.recv();
-	cout << "Pos is: " << pos << endl;
-	recfifo.fifoclose();	
-	return player1Loss;
+	cout << "Pos received: " << pos << endl;
+	recfifo.fifoclose();
 	
+	//check win condition here
+	//if wincondition, return loss
+	
+	return player2Turn;
 }
 
-state player1LossFn() {
-	cout << "Player 1 lost!" << endl;
+state player2TurnFn(string& pos) {
+	recfifo.openread();
+	pos = recfifo.recv();
+	cout << "Pos received: " << pos << endl;
+	recfifo.fifoclose();
+	
+	//check win condition here
+	//if wincondition, return loss
+	
+	return player1Win;
+}
+
+state player1WinFn(int& player1Wins) {
+	cout << "Player 1 won!" << endl;
+	cout << "Player 2 lost!" << endl;
+	player1Wins++;
 	return noPlayer;
 }
 
-state player2LossFn() {
-	cout << "Player 2 lost!" << endl;
+state player2WinFn(int& player2Wins) {
+	cout << "Player 2 won!" << endl;
+	cout << "Player 1 lost!" << endl;
+	player2Wins++;
 	return noPlayer;
 }
