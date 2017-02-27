@@ -50,6 +50,7 @@ int main() {
 		sendfifo.send(message);
 		recfifo.openread();
 		serverStatus = recfifo.recv();
+		cout << "Server status: " << serverStatus << endl;
 		if (serverStatus.find(errorString) != -1) {
 			cout << "The server sent back an error--select a different square." << endl;
 		} else if (serverStatus.find(player1String) != -1) {

@@ -97,17 +97,13 @@ state player1TurnFn(Game& game) {
 		sendfifo.send(errorString);
 		sendfifo.fifoclose();
 		return player1Turn;
-	} else {
+	} else if (game.checkWin() != true) {
 		sendfifo.openwrite();
 		sendfifo.send(happyString);
 		sendfifo.fifoclose();
-	}
-	
-	if (game.checkWin() == true) {
+	} else {
 		cout << "A win (P1) was detected!" << endl;
 		return player1Win;
-	} else {
-		cout << "A win (P1) was not detected." << endl;
 	}
 	
 	return player2Turn;
@@ -132,19 +128,14 @@ state player2TurnFn(Game& game) {
 		sendfifo.send(errorString);
 		sendfifo.fifoclose();
 		return player2Turn;
-	} else {
+	} else if (game.checkWin() != true) {
 		sendfifo.openwrite();
 		sendfifo.send(happyString);
 		sendfifo.fifoclose();
-	}
-	
-	if (game.checkWin() == true) {
+	} else {
 		cout << "A win (P2) was detected!" << endl;
 		return player2Win;
-	} else {
-		cout << "A win (P2) was not detected." << endl;
 	}
-	
 	return player1Turn;
 }
 
