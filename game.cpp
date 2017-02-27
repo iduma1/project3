@@ -3,13 +3,108 @@
 #include <vector>
 #include "game.h"
 
-Game::Game() {
-    gamestate[2][2];
+Game::Game() {		 
+    vector <char> tttBoard; 
+    coord = 0;
     currentPlayer = 1;
-    xPos = 0;
-    yPos = 0;
     player1Wins = 0;
     player2Wins = 0;
+}
+
+
+void Game::clearBoard() {
+	for (int i = 0; i < 9; i++) {
+		tttBoard.push_back(' ');
+	}
+}
+
+bool Game::makeMove(string message) {
+	if (message == "0") {
+		coord = 0;
+	} else if (message == "1") {
+		coord = 1;	
+	} else if (message == "2") {
+		coord = 2;	
+	} else if (message == "3") {
+		coord = 3;	
+	} else if (message == "4") {
+		coord = 4;	
+	} else if (message == "5") {
+		coord = 5;	
+	} else if (message == "6") {
+		coord = 6;	
+	} else if (message == "7") {
+		coord = 7;	
+	} else if (message == "8") {
+		coord = 8;	
+	} else {
+		cout << "Error--message: " << message << " is not a valid value." << endl;
+		return false;
+	}
+	if (currentPlayer == 1) {
+		if (tttBoard[coord] == 'X' || tttBoard[coord] == 'O') {
+			cout << "Error, that square is already occupied." << endl;
+		} else {
+			tttBoard[coord] = 'X';
+			nextTurn();
+			return true;
+		}
+	} else if (currentPlayer == 2) {
+		if (tttBoard[coord] == 'X' || tttBoard[coord] == 'O') {
+			cout << "Error, that square is already occupied." << endl;
+		} else {
+			tttBoard[coord] = 'O';
+			nextTurn();
+			return true;
+		}
+	} else {
+		cout << "Error--currentPlayer: " << currentPlayer << "is not a valid value." << endl;
+		return false;
+	}
+}
+
+bool Game::checkWin() {
+
+	/* Okay all this is doing is checking whether or not any three spots on the tic tac
+	   toe board equal each other, and that they aren't equal to a ' ' char */
+
+	bool temp = false;
+
+	if ((tttBoard[0] == tttBoard[4]) && (tttBoard[0] == tttBoard[8]) && (tttBoard[0] != ' ')) {
+		temp = true;
+		//cout << "wCondition 1" << endl;
+	} else if ((tttBoard[6] == tttBoard[4]) && (tttBoard[6] == tttBoard[2]) && (tttBoard[6] != ' ')) {
+		temp = true;
+		//cout << "wCondition 2" << endl;		
+	} else if ((tttBoard[0] == tttBoard[3]) && (tttBoard[0] == tttBoard[6]) && (tttBoard[0] != ' ')) {
+		temp = true;
+		//cout << "wCondition 3" << endl;
+	} else if ((tttBoard[1] == tttBoard[4]) && (tttBoard[1] == tttBoard[7]) && (tttBoard[1] != ' ')) {
+		temp = true;
+		//cout << "wCondition 4" << endl;
+	} else if ((tttBoard[2] == tttBoard[5]) && (tttBoard[2] == tttBoard[8]) && (tttBoard[2] != ' ')) {
+		temp = true;
+		//cout << "wCondition 5" << endl;
+	} else if ((tttBoard[0] == tttBoard[1]) && (tttBoard[0] == tttBoard[2]) && (tttBoard[0] != ' ')) {
+		temp = true;
+		//cout << "wCondition 6" << endl;
+	} else if ((tttBoard[3] == tttBoard[4]) && (tttBoard[3] == tttBoard[5]) && (tttBoard[3] != ' ')) {
+		temp = true;
+		//cout << "wCondition 7" << endl;
+	} else if ((tttBoard[6] == tttBoard[7]) && (tttBoard[6] == tttBoard[8]) && (tttBoard[6] != ' ')) {
+		temp = true;
+		//cout << "wCondition 8" << endl;
+	} else {
+		return false;
+	}
+	
+	if (temp == true && currentPlayer == 1) {
+		player1Wins++;
+		return true;
+	} else if (temp == true && currentPlayer == 2) {
+		player2Wins++;
+		return true;
+	}
 }
 
 void Game::nextTurn() {
@@ -21,6 +116,18 @@ void Game::nextTurn() {
 		currentPlayer = 1;
 	}
 	//cout << "The value of currentPlayer is: " << currentPlayer << endl;
+}
+
+void Game::displayBoard() {
+	cout << "Board below:" << endl;
+	for (int i = 0; i < 9; i++) {
+		cout << tttBoard[i] << "|";
+		
+		//if this is the third run of the code, cout an endline
+		if (i == 2 || i == 5 || i == 8) {
+			cout << endl;
+		}
+	}
 }
 
 void Game::setPlayer1Name(string message) {
@@ -39,126 +146,4 @@ void Game::setPlayer2Name(string message) {
 
 string Game::getPlayer2Name() {
 	return player2Name;
-}
-
-void Game::setPos(string message) {
-	
-	string yMessage = message.substr(1,1); //get the first character from the string
-	string xMessage = message.substr(3,3); //get the last character from the string
-										//ex (0,2) -- 0 is the Y coord and 2 is the X coord
-	
-	//cout << "xMessage is: " << xMessage << endl;
-
-	if (xMessage == "0") {
-		xPos = 0;
-	} else if (xMessage == "1") {
-		xPos = 1;
-	} else if (xMessage == "2") {
-		xPos = 2;
-	} else {
-		cout << "An error has occurred--xMessage is not 0 1 or 2" << endl;
-	}
-	
-	//cout << "yMessage is: " << yMessage << endl;
-
-	if (yMessage == "0") {
-		yPos = 0;
-	} else if (yMessage == "1") {
-		yPos = 1;
-	} else if (yMessage == "2") {
-		yPos = 2;
-	} else {
-		cout << "An error has occurred--yMessage is not 0 1 or 2" << endl;
-	}
-}
-
-int Game::getxPos() {
-	return xPos;
-}
-
-int Game::getyPos() {
-	return yPos;
-}
-
-void Game::clearBoard() {
-	for (int i = 0; i < 3; i++) {
-		for (int k = 0; k < 3; k++) {
-			gamestate[i][k] = ' ';
-		}
-	}
-}
-
-void Game::stabilizeBoard() {
-	for (int i = 0; i < 3; i++) {
-		for (int k = 0; k < 3; k++) {
-			if (gamestate[i][k] != 'X' || gamestate[i][k] != 'O') {
-				gamestate[i][k] = ' ';
-			}
-		}
-	}
-}
-
-void Game::displayBoard() {
-	cout << "Board below:" << endl;
-	for (int i = 0; i < 3; i++) {
-		for (int k = 0; k < 3; k++) {
-			cout << gamestate[i][k] << "|";
-		}
-		cout << endl;
-	}
-}
-
-void Game::makeMove() {
-
-	/* Eventually this function is going to need to be merged with setPos, because if
-	someone enters a coordinate that's already occupied we need to be able to detect that
-	error easily */
-	
-	nextTurn();
-	//cout << "The value of currentPlayer is: " << currentPlayer << endl;
-	//cout << "xPos is: " << xPos << endl;
-	//cout << "yPos is: " << yPos << endl;
-	if (currentPlayer == 1) {
-		gamestate[yPos][xPos] = 'X';
-		//cout << "The value of currentPlayer is: " << currentPlayer << endl;
-		//cout << "If this code ran, currentPlayer is 1." << endl;
-	} else if (currentPlayer == 2) {
-		gamestate[yPos][xPos] = 'O';
-	}
-}
-
-bool Game::checkWin() {
-
-	/* Okay all this is doing is checking whether or not any three spots on the tic tac
-	   toe board equal each other, and that they aren't equal to a ' ' char */
-
-	bool temp = false;
-
-	if (gamestate[0][0] == gamestate[1][1] == gamestate[2][2] && gamestate[0][0] != ' ') {
-		temp = true;
-	} else if (gamestate[2][0] == gamestate[1][1] == gamestate[0][2] && gamestate[2][0] != ' ') {
-		temp = true;
-	} else if (gamestate[0][0] == gamestate[1][0] == gamestate[2][0] && gamestate[0][0] != ' ') {
-		temp = true;
-	} else if (gamestate[0][1] == gamestate[1][1] == gamestate[2][1] && gamestate[0][1] != ' ') {
-		temp = true;
-	} else if (gamestate[0][2] == gamestate[1][2] == gamestate[2][2] && gamestate[0][2] != ' ') {
-		temp = true;
-	} else if (gamestate[0][0] == gamestate[0][1] == gamestate[0][2] && gamestate[0][0] != ' ') {
-		temp = true;
-	} else if (gamestate[1][0] == gamestate[1][1] == gamestate[1][2] && gamestate[1][0] != ' ') {
-		temp = true;
-	} else if (gamestate[2][0] == gamestate[2][1] == gamestate[2][2] && gamestate[2][0] != ' ') {
-		temp = true;
-	} else {
-		return false;
-	}
-	
-	if (temp == true && currentPlayer == 1) {
-		player1Wins++;
-		return true;
-	} else if (temp == true && currentPlayer == 2) {
-		player2Wins++;
-		return true;
-	}
 }

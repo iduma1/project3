@@ -6,37 +6,29 @@ using namespace std;
 class Game {
 public:    
     Game();
-    
-    void setPos(string message);  
-      
-    int getxPos();
-    int getyPos();
-    
+        
     void setPlayer1Name(string message);    
     string getPlayer1Name();
     
     void setPlayer2Name(string message);    
     string getPlayer2Name();
     
-    void nextTurn();
-    
-    void makeMove();
-    
-    bool checkWin();
-    
     void clearBoard();
-    void stabilizeBoard();
+
+    bool makeMove(string message);
+
+    bool checkWin();
+
+    void nextTurn();
     
     void displayBoard();
     
-private:    
-    char gamestate[2][2];
+private:        
+    vector <char> tttBoard;
     
     int currentPlayer;
     
-    int xPos;
-    
-    int yPos;
+    int coord;
     
     int player1Wins;
     

@@ -22,41 +22,38 @@ string send_fifo = "status";
 Fifo recfifo(receive_fifo);
 Fifo sendfifo(send_fifo);
 
-enum state {noPlayer, onePlayer, player1Turn, player2Turn, player1Win, player2Win};
+enum state {noPlayer, onePlayer, player1Turn, player2Turn, player1Win, player2Win, exitGame};
 
 /* State machine functions */
 state noPlayerFn(string& player1Name);
-state onePlayerFn(string& player2Name);
-state player1TurnFn(string& pos, Game& game);
-state player2TurnFn(string& pos, Game& game);
-state player1WinFn(int& player1Wins);
-state player2WinFn(int& player2Wins);
+state onePlayerFn(string& player2Name, Game& game);
+state player1TurnFn(Game& game);
+state player2TurnFn(Game& game);
+state player1WinFn();
+state player2WinFn();
 
 int main() {
 	Game game;
 	state current;
 	current = noPlayer;
 	string player1Name, player2Name;
-	string pos;
-	int player1Wins, player2Wins;
 	
 	cout << "Waiting for people to connect..." << endl;
 	while (1) {
 		switch (current) {
 			case noPlayer:	current = noPlayerFn(player1Name);
 				break;
-			case onePlayer: current = onePlayerFn(player2Name);
-							cout << "Both players connected!" << endl;
-							game.clearBoard();
+			case onePlayer: current = onePlayerFn(player2Name, game);
 				break;
-			case player1Turn: current = player1TurnFn(pos, game);
+			case player1Turn: current = player1TurnFn(game);
 				break;
-			case player2Turn: current = player2TurnFn(pos, game);
+			case player2Turn: current = player2TurnFn(game);
 				break;
-			case player1Win: current = player1WinFn(player1Wins);
+			case player1Win: current = player1WinFn();
 				break;
-			case player2Win: current = player2WinFn(player2Wins);
+			case player2Win: current = player2WinFn();
 				break;
+			case exitGame: return 0;
 		}
 	}
 	return 0;
@@ -64,72 +61,113 @@ int main() {
 
 state noPlayerFn(string& player1Name) {
 	cout << "No players connected" << endl;
-	//sendfifo.openwrite();//Blocks out others
-	//cout << "open send fifo" << endl;
 	recfifo.openread();//Opens rec fifo
 	player1Name = recfifo.recv();//stores player 1 name
 	cout << "Message received--player 1's name is: " << player1Name << endl;
 	recfifo.fifoclose();
-	//sendfifo.fifoclose();
 	return onePlayer;
 }
 
-state onePlayerFn(string& player2Name) {
-	//sendfifo.openwrite();
+state onePlayerFn(string& player2Name, Game& game) {
 	recfifo.openread();
 	player2Name = recfifo.recv();
 	cout << "Message received--player 2's name is: " << player2Name << endl;
 	recfifo.fifoclose();
-	//sendfifo.fifoclose();
+	cout << "Both players connected!" << endl;
+	game.clearBoard();
 	return player1Turn;
 }
 
-state player1TurnFn(string& pos, Game& game) {
+state player1TurnFn(Game& game) {
+	string errorString = "$INVALID";
+	string happyString = "$GOOD";
+	
+	bool legitMove;
+	
 	recfifo.openread();
-	pos = recfifo.recv();
-	//cout << "Pos received: " << pos << endl;
+	string message = recfifo.recv();
 	recfifo.fifoclose();
 	
-	game.setPos(pos);
-	game.displayBoard();
-	game.makeMove();
-	//game.stabilizeBoard();
+	legitMove = game.makeMove(message);
+	cout << "Made a move, displaying it below." << endl;
 	game.displayBoard();
 	
-	//check win condition here
-	//if wincondition, return loss
+	if (legitMove == false) {
+		sendfifo.openwrite();
+		sendfifo.send(errorString);
+		sendfifo.fifoclose();
+		return player1Turn;
+	} else {
+		sendfifo.openwrite();
+		sendfifo.send(happyString);
+		sendfifo.fifoclose();
+	}
+	
+	if (game.checkWin() == true) {
+		cout << "A win (P1) was detected!" << endl;
+		return player1Win;
+	} else {
+		cout << "A win (P1) was not detected." << endl;
+	}
 	
 	return player2Turn;
 }
 
-state player2TurnFn(string& pos, Game& game) {
+state player2TurnFn(Game& game) {
+	string errorString = "$INVALID";
+	string happyString = "$GOOD";
+
+	bool legitMove;
+	
 	recfifo.openread();
-	pos = recfifo.recv();
-	//cout << "Pos received: " << pos << endl;
+	string message = recfifo.recv();
 	recfifo.fifoclose();
 	
-	game.setPos(pos);
-	game.displayBoard();
-	game.makeMove();
-	//game.stabilizeBoard();
+	legitMove = game.makeMove(message);
+	cout << "Made a move, displaying it below." << endl;
 	game.displayBoard();
 	
-	//check win condition here
-	//if wincondition, return loss
+	if (legitMove == false) {
+		sendfifo.openwrite();
+		sendfifo.send(errorString);
+		sendfifo.fifoclose();
+		return player2Turn;
+	} else {
+		sendfifo.openwrite();
+		sendfifo.send(happyString);
+		sendfifo.fifoclose();
+	}
+	
+	if (game.checkWin() == true) {
+		cout << "A win (P2) was detected!" << endl;
+		return player2Win;
+	} else {
+		cout << "A win (P2) was not detected." << endl;
+	}
 	
 	return player1Turn;
 }
 
-state player1WinFn(int& player1Wins) {
+state player1WinFn() {
+	string winString = "$P1WIN";
+
+	sendfifo.openwrite();
+	sendfifo.send(winString);
+	sendfifo.fifoclose();
+
 	cout << "Player 1 won!" << endl;
 	cout << "Player 2 lost!" << endl;
-	player1Wins++;
-	return noPlayer;
+	return exitGame;
 }
 
-state player2WinFn(int& player2Wins) {
+state player2WinFn() {		
+	string winString = "$P2WIN";
+
+	sendfifo.openwrite();
+	sendfifo.send(winString);
+	sendfifo.fifoclose();
+
 	cout << "Player 2 won!" << endl;
 	cout << "Player 1 lost!" << endl;
-	player2Wins++;
-	return noPlayer;
+	return exitGame;
 }
