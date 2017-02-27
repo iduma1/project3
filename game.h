@@ -7,8 +7,10 @@ class Game {
 public:    
     Game();
     
-    void setPos(string message);    
-    int getPos();
+    void setPos(string message);  
+      
+    int getxPos();
+    int getyPos();
     
     void setPlayer1Name(string message);    
     string getPlayer1Name();
@@ -16,20 +18,25 @@ public:
     void setPlayer2Name(string message);    
     string getPlayer2Name();
     
-    void makeMove();
-    bool checkWin();
-    void clearBoard();
+    void nextTurn();
     
-    //increment "wins" and tell the player what happened
-    void win();
-
-    //increment "losses" and tell the player what happened    
-    void lose();
+    void makeMove();
+    
+    bool checkWin();
+    
+    void clearBoard();
+    void stabilizeBoard();
+    
+    void displayBoard();
     
 private:    
     char gamestate[2][2];
     
-    int pos;
+    int currentPlayer;
+    
+    int xPos;
+    
+    int yPos;
     
     int player1Wins;
     

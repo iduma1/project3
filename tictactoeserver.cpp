@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <string>
 #include "fifo.h"
+#include "game.h"
 
 using namespace std;
 
@@ -26,13 +27,13 @@ enum state {noPlayer, onePlayer, player1Turn, player2Turn, player1Win, player2Wi
 /* State machine functions */
 state noPlayerFn(string& player1Name);
 state onePlayerFn(string& player2Name);
-state player1TurnFn(string& pos);
-state player2TurnFn(string& pos);
+state player1TurnFn(string& pos, Game& game);
+state player2TurnFn(string& pos, Game& game);
 state player1WinFn(int& player1Wins);
 state player2WinFn(int& player2Wins);
 
 int main() {
-		
+	Game game;
 	state current;
 	current = noPlayer;
 	string player1Name, player2Name;
@@ -46,10 +47,11 @@ int main() {
 				break;
 			case onePlayer: current = onePlayerFn(player2Name);
 							cout << "Both players connected!" << endl;
+							game.clearBoard();
 				break;
-			case player1Turn: current = player1TurnFn(pos);
+			case player1Turn: current = player1TurnFn(pos, game);
 				break;
-			case player2Turn: current = player2TurnFn(pos);
+			case player2Turn: current = player2TurnFn(pos, game);
 				break;
 			case player1Win: current = player1WinFn(player1Wins);
 				break;
@@ -82,11 +84,17 @@ state onePlayerFn(string& player2Name) {
 	return player1Turn;
 }
 
-state player1TurnFn(string& pos) {
+state player1TurnFn(string& pos, Game& game) {
 	recfifo.openread();
 	pos = recfifo.recv();
-	cout << "Pos received: " << pos << endl;
+	//cout << "Pos received: " << pos << endl;
 	recfifo.fifoclose();
+	
+	game.setPos(pos);
+	game.displayBoard();
+	game.makeMove();
+	//game.stabilizeBoard();
+	game.displayBoard();
 	
 	//check win condition here
 	//if wincondition, return loss
@@ -94,16 +102,22 @@ state player1TurnFn(string& pos) {
 	return player2Turn;
 }
 
-state player2TurnFn(string& pos) {
+state player2TurnFn(string& pos, Game& game) {
 	recfifo.openread();
 	pos = recfifo.recv();
-	cout << "Pos received: " << pos << endl;
+	//cout << "Pos received: " << pos << endl;
 	recfifo.fifoclose();
+	
+	game.setPos(pos);
+	game.displayBoard();
+	game.makeMove();
+	//game.stabilizeBoard();
+	game.displayBoard();
 	
 	//check win condition here
 	//if wincondition, return loss
 	
-	return player1Win;
+	return player1Turn;
 }
 
 state player1WinFn(int& player1Wins) {
