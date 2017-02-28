@@ -22,11 +22,12 @@ string send_fifo = "status";
 Fifo recfifo(receive_fifo);
 Fifo sendfifo(send_fifo);
 
-enum state {noPlayer, onePlayer, player1Turn, player2Turn, player1Win, player2Win, exitGame};
+enum state {noPlayer, onePlayer, twoPlayer, player1Turn, player2Turn, player1Win, player2Win, exitGame};
 
 /* State machine functions */
-state noPlayerFn(string& player1Name);
-state onePlayerFn(string& player2Name, Game& game);
+state noPlayerFn(Game& game);
+state onePlayerFn(Game& game);
+state twoPlayerFn(Game& game);
 state player1TurnFn(Game& game);
 state player2TurnFn(Game& game);
 state player1WinFn();
@@ -36,14 +37,15 @@ int main() {
 	Game game;
 	state current;
 	current = noPlayer;
-	string player1Name, player2Name;
 	
 	cout << "Waiting for people to connect..." << endl;
 	while (1) {
 		switch (current) {
-			case noPlayer:	current = noPlayerFn(player1Name);
+			case noPlayer:	current = noPlayerFn(game);
 				break;
-			case onePlayer: current = onePlayerFn(player2Name, game);
+			case onePlayer: current = onePlayerFn(game);
+				break;
+			case twoPlayer: current = twoPlayerFn(game);
 				break;
 			case player1Turn: current = player1TurnFn(game);
 				break;
@@ -59,37 +61,60 @@ int main() {
 	return 0;
 }
 
-state noPlayerFn(string& player1Name) {
+state noPlayerFn(Game& game) {
 	cout << "No players connected" << endl;
 	recfifo.openread();//Opens rec fifo
-	player1Name = recfifo.recv();//stores player 1 name
-	cout << "Message received--player 1's name is: " << player1Name << endl;
+	string player1Name = recfifo.recv();//stores player 1 name
+	//cout << "Message received--player 1's name is: " << player1Name << endl;
+	game.setPlayer1Name(player1Name);
 	recfifo.fifoclose();
 	return onePlayer;
 }
 
-state onePlayerFn(string& player2Name, Game& game) {
+state onePlayerFn(Game& game) {
 	recfifo.openread();
-	player2Name = recfifo.recv();
-	cout << "Message received--player 2's name is: " << player2Name << endl;
+	string player2Name = recfifo.recv();
+	game.setPlayer2Name(player2Name);
 	recfifo.fifoclose();
+	return twoPlayer;
+}
+
+state twoPlayerFn(Game& game) {
+	string player1Name = game.getPlayer1Name();
+	string readyToPlay = "$GO" + player1Name;
+	
 	cout << "Both players connected!" << endl;
+	
 	game.clearBoard();
+	sendfifo.openwrite();
+	sendfifo.send(readyToPlay);
+	sendfifo.fifoclose();
+	
+	//cout << "Send the readyToPlay!" << endl;
+	
 	return player1Turn;
 }
 
 state player1TurnFn(Game& game) {
+	string player2Name = game.getPlayer2Name();
 	string errorString = "$INVALID";
-	string happyString = "$GOOD";
+	string happyString = "$GO" + player2Name;
 	
 	bool legitMove;
-	
+		
 	recfifo.openread();
 	string message = recfifo.recv();
 	recfifo.fifoclose();
 	
+	/*if (message.find(player2Name) != -1) {
+		cout << "Error: " << player2Name << ", it isn't your turn!" << endl; 
+		legitMove = false;
+	} else {
+		legitMove = game.makeMove(message);
+	}*/
+	
 	legitMove = game.makeMove(message);
-	cout << "Made a move, displaying it below." << endl;
+	
 	game.displayBoard();
 	
 	if (legitMove == false) {
@@ -99,6 +124,7 @@ state player1TurnFn(Game& game) {
 		return player1Turn;
 	} else if (game.checkWin() != true) {
 		sendfifo.openwrite();
+		sendfifo.send(happyString);
 		sendfifo.send(happyString);
 		sendfifo.fifoclose();
 	} else {
@@ -110,17 +136,25 @@ state player1TurnFn(Game& game) {
 }
 
 state player2TurnFn(Game& game) {
+	string player1Name = game.getPlayer1Name();
 	string errorString = "$INVALID";
-	string happyString = "$GOOD";
+	string happyString = "$GO" + player1Name;
 
-	bool legitMove;
-	
+	bool legitMove = true;
+		
 	recfifo.openread();
-	string message = recfifo.recv();
+	string message = recfifo.recv(); //receive the coordinate
 	recfifo.fifoclose();
 	
+	/*if (message.find(player1Name) != -1) {
+		cout << "Error: " << player1Name << ", it isn't your turn!" << endl; 
+		legitMove = false;
+	} else {
+		legitMove = game.makeMove(message);
+	}*/
+	
 	legitMove = game.makeMove(message);
-	cout << "Made a move, displaying it below." << endl;
+	
 	game.displayBoard();
 	
 	if (legitMove == false) {
@@ -130,6 +164,7 @@ state player2TurnFn(Game& game) {
 		return player2Turn;
 	} else if (game.checkWin() != true) {
 		sendfifo.openwrite();
+		sendfifo.send(happyString);
 		sendfifo.send(happyString);
 		sendfifo.fifoclose();
 	} else {

@@ -19,23 +19,26 @@ void Game::clearBoard() {
 }
 
 bool Game::makeMove(string message) {
-	if (message == "0") {
+
+	string strCoord = message.substr(1,1);
+
+	if (strCoord == "0") {
 		coord = 0;
-	} else if (message == "1") {
+	} else if (strCoord == "1") {
 		coord = 1;	
-	} else if (message == "2") {
+	} else if (strCoord == "2") {
 		coord = 2;	
-	} else if (message == "3") {
+	} else if (strCoord == "3") {
 		coord = 3;	
-	} else if (message == "4") {
+	} else if (strCoord == "4") {
 		coord = 4;	
-	} else if (message == "5") {
+	} else if (strCoord == "5") {
 		coord = 5;	
-	} else if (message == "6") {
+	} else if (strCoord == "6") {
 		coord = 6;	
-	} else if (message == "7") {
+	} else if (strCoord == "7") {
 		coord = 7;	
-	} else if (message == "8") {
+	} else if (strCoord == "8") {
 		coord = 8;	
 	} else {
 		cout << "Error--message: " << message << " is not a valid value." << endl;
