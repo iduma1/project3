@@ -30,8 +30,8 @@ state onePlayerFn(Game& game);
 state twoPlayerFn(Game& game);
 state player1TurnFn(Game& game);
 state player2TurnFn(Game& game);
-state player1WinFn();
-state player2WinFn();
+state player1WinFn(Game& game);
+state player2WinFn(Game& game);
 
 int main() {
 	Game game;
@@ -51,9 +51,9 @@ int main() {
 				break;
 			case player2Turn: current = player2TurnFn(game);
 				break;
-			case player1Win: current = player1WinFn();
+			case player1Win: current = player1WinFn(game);
 				break;
-			case player2Win: current = player2WinFn();
+			case player2Win: current = player2WinFn(game);
 				break;
 			case exitGame: return 0;
 		}
@@ -174,8 +174,9 @@ state player2TurnFn(Game& game) {
 	return player1Turn;
 }
 
-state player1WinFn() {
-	string winString = "$P1WIN";
+state player1WinFn(Game& game) {
+	string player1Name = game.getPlayer1Name();
+	string winString = "$WIN" + player1Name;
 
 	sendfifo.openwrite();
 	sendfifo.send(winString);
@@ -186,8 +187,9 @@ state player1WinFn() {
 	return exitGame;
 }
 
-state player2WinFn() {		
-	string winString = "$P2WIN";
+state player2WinFn(Game& game) {
+	string player2Name = game.getPlayer2Name();
+	string winString = "$WIN" + player2Name;
 
 	sendfifo.openwrite();
 	sendfifo.send(winString);

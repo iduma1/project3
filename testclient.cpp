@@ -20,12 +20,13 @@ string send_fifo = "nextMove";
 Fifo recfifo(receive_fifo);
 Fifo sendfifo(send_fifo);
 
+bool error(string serverStatus);
+bool win(string playerName, string serverStatus);
+bool readyToGo(string readyToPlay);
+string makeMessage(string playerName);
+
 int main() {
 	string playerName, message, serverStatus;
-	string errorString = "$INVALID";
-	string player1String = "$P1WIN";
-	string player2String = "$P2WIN";
-
  
 	cout << "Opening send FIFO" << endl;
 	sendfifo.openwrite();
@@ -40,42 +41,77 @@ int main() {
 	//cout << "Enter a number between 0-8. These correspond to the positions on the tic tac toe board." << endl;
 	//cout << "The increase from left to right (e.g. 0 is the top left corner, 2 is the top right, 8 is the bottom right." << endl;
 	while (1) {
-		recfifo.openread();
-		while (1) {
-			serverStatus = recfifo.recv();
-			cout << "Primary server status: " << serverStatus << endl;
-			if (serverStatus.find(readyToPlay) != -1) {
-				break;
-			}
+		while (readyToGo(readyToPlay) == false) {
+			cout << "Waiting for my turn..." << endl;
 		}
+
+		message = makeMessage(playerName);
+		sendfifo.send(message);
+		
+		recfifo.openread();
+		serverStatus = recfifo.recv();
 		recfifo.fifoclose();
 		
-		cout << "It's your turn, input a message." << endl;
+		cout << "Secondary server status: " << serverStatus << endl;
+		while (error(serverStatus) == true) {
+			message = makeMessage(playerName);
+			sendfifo.send(message);			
+		} 
+		if (win(playerName, serverStatus) == true) {
+			break;
+		}
+	}
+	sendfifo.fifoclose();
+	cout << "Closing the fifo, ending the game." << endl;
+}
+
+bool error(string serverStatus) {
+	string errorString = "$INVALID";
+	if (serverStatus.find(errorString) != -1) {
+		cout << "Error. String that you sent was invalid." << endl;
+		return true;
+	} else {
+		return false;
+	}
+}
+
+bool win(string playerName, string serverStatus) {
+	string player1String = "$WIN" + playerName;
+	string winString = "$WIN";
+	if (serverStatus.find(player1String) != -1) {
+		cout << "You," << playerName << ", won!" << endl;
+		return true;
+	} else if (serverStatus.find(winString) != -1) {
+		cout << "The other player won :(" << endl;
+		return true;
+	} else {
+		return false;
+	}
+}
+
+bool readyToGo(string readyToPlay) {
+	recfifo.openread();
+	string serverStatus = recfifo.recv();
+	recfifo.fifoclose();
+	if (serverStatus.find(readyToPlay) != -1) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+string makeMessage(string playerName) {
+	string message, finalMessage;
+	bool error = false;
+	do {
+		cout << "Enter coordinates." << endl;
 		cin >> message;
 		if (message.length() != 1) {
 			cout << "Your message must be a number between 0 and 8." << endl;
-			break;
+			error = true;
 		}
-		string sigMessage = "$" + message + playerName;
-		sendfifo.send(sigMessage);
-		recfifo.openread();
-		serverStatus = recfifo.recv();
-		cout << "Secondary server status: " << serverStatus << endl;
-		if (serverStatus.find(errorString) != -1) {
-			cout << "The server sent back an error. If it's your turn, select a different square." << endl;
-			cout << "If it's not your turn, wait for your your turn!" << endl;
-		} else if (serverStatus.find(player1String) != -1) {
-			cout << playerName << " won!" << endl;
-			recfifo.fifoclose();
-			break;
-		} else if (serverStatus.find(player2String) != -1) {
-			cout << playerName << " won!" << endl;
-			recfifo.fifoclose();
-			break;
-		}
-		recfifo.fifoclose();
-	}
-	sendfifo.fifoclose();
-	cout << "Closing the fifo, resetting the game." << endl;
+	} while (error == true);
 	
+	finalMessage = "$" + message + playerName;
+	return finalMessage;
 }
