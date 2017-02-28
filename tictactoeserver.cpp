@@ -90,7 +90,7 @@ state twoPlayerFn(Game& game) {
 	sendfifo.send(readyToPlay);
 	sendfifo.fifoclose();
 	
-	//cout << "Send the readyToPlay!" << endl;
+	cout << "Send the readyToPlay!" << endl;
 	
 	return player1Turn;
 }

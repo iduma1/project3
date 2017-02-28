@@ -26,11 +26,14 @@ tictactoeserver.o: tictactoeserver.cpp fifo.h
 testclient: testclient.o fifo.o
 	$(CC) testclient.o fifo.o -o testclient
 
-tictactoeserver: tictactoeserver.o fifo.o
-	$(CC) tictactoeserver.o  fifo.o -o tictactoeserver 
+tictactoeserver: tictactoeserver.o fifo.o game.o
+	$(CC) tictactoeserver.o  fifo.o game.o -o tictactoeserver 
 
-fifo.o:		fifo.cpp fifo.h
+fifo.o:	fifo.cpp fifo.h
 	g++ -c fifo.cpp
+game.o: game.cpp game.h
+	g++ -c game.cpp
+
 		
 #tictactoeclient: namefetchajax.o  fifo.h
 #	$(CC) namefetchajax.o  fifo.o -o namefetchajax -L/usr/local/lib -lcgicc
