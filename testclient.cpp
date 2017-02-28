@@ -13,6 +13,8 @@ using namespace std;
 
 string receive_fifo = "status";
 string send_fifo = "nextMove";
+
+//Just testing things 
 	
 // create the FIFOs for communication
 Fifo recfifo(receive_fifo);
