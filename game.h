@@ -15,6 +15,11 @@ public:
     
     int getNumberOfMoves();
     
+    string getBoardState();
+    
+    string intToString(int i);
+	int stringToInt(string message);
+    
     void clearBoard();
 
     bool makeMove(string message);

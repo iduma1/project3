@@ -12,39 +12,74 @@ Game::Game() {
     numberOfMoves = 0;
 }
 
+string Game::intToString(int i) {
+
+	string convertedString;
+
+	if (i == 0) {
+		convertedString = "0";
+	} else if (i == 1) {
+		convertedString = "1";	
+	} else if (i == 2) {
+		convertedString = "2";	
+	} else if (i == 3) {
+		convertedString = "3";	
+	} else if (i == 4) {
+		convertedString = "4";	
+	} else if (i == 5) {
+		convertedString = "5";	
+	} else if (i == 6) {
+		convertedString = "6";	
+	} else if (i == 7) {
+		convertedString = "7";	
+	} else if (i == 8) {
+		convertedString = "8";	
+	} else {
+		cout << "Error--string conversion failed." << endl;
+		return "butt";
+	}
+	return convertedString;
+}
+
+int Game::stringToInt(string message) {
+	
+	int convertedInt;
+
+	if (message == "0") {
+		convertedInt = 0;
+	} else if (message == "1") {
+		convertedInt = 1;	
+	} else if (message == "2") {
+		convertedInt = 2;	
+	} else if (message == "3") {
+		convertedInt = 3;	
+	} else if (message == "4") {
+		convertedInt = 4;	
+	} else if (message == "5") {
+		convertedInt = 5;	
+	} else if (message == "6") {
+		convertedInt = 6;	
+	} else if (message == "7") {
+		convertedInt = 7;	
+	} else if (message == "8") {
+		convertedInt = 8;	
+	} else {
+		cout << "Error--int conversion failed." << endl;
+		return -1;
+	}
+	return convertedInt;
+}
 
 void Game::clearBoard() {
 	for (int i = 0; i < 9; i++) {
-		tttBoard.push_back(' ');
+		tttBoard.push_back('Z');
 	}
 }
 
 bool Game::makeMove(string message) {
 
-	string strCoord = message.substr(1,1);
-
-	if (strCoord == "0") {
-		coord = 0;
-	} else if (strCoord == "1") {
-		coord = 1;	
-	} else if (strCoord == "2") {
-		coord = 2;	
-	} else if (strCoord == "3") {
-		coord = 3;	
-	} else if (strCoord == "4") {
-		coord = 4;	
-	} else if (strCoord == "5") {
-		coord = 5;	
-	} else if (strCoord == "6") {
-		coord = 6;	
-	} else if (strCoord == "7") {
-		coord = 7;	
-	} else if (strCoord == "8") {
-		coord = 8;	
-	} else {
-		cout << "Error--message: " << message << " is not a valid value." << endl;
-		return false;
-	}
+	coord = stringToInt(message);
+	
 	if (currentPlayer == 1) {
 		if (tttBoard[coord] == 'X' || tttBoard[coord] == 'O') {
 			cout << "Error, that square is already occupied." << endl;
@@ -74,28 +109,28 @@ bool Game::checkWin() {
 
 	bool temp = false;
 
-	if ((tttBoard[0] == tttBoard[4]) && (tttBoard[0] == tttBoard[8]) && (tttBoard[0] != ' ')) {
+	if ((tttBoard[0] == tttBoard[4]) && (tttBoard[0] == tttBoard[8]) && (tttBoard[0] != 'Z')) {
 		temp = true;
 		//cout << "wCondition 1" << endl;
-	} else if ((tttBoard[6] == tttBoard[4]) && (tttBoard[6] == tttBoard[2]) && (tttBoard[6] != ' ')) {
+	} else if ((tttBoard[6] == tttBoard[4]) && (tttBoard[6] == tttBoard[2]) && (tttBoard[6] != 'Z')) {
 		temp = true;
 		//cout << "wCondition 2" << endl;		
-	} else if ((tttBoard[0] == tttBoard[3]) && (tttBoard[0] == tttBoard[6]) && (tttBoard[0] != ' ')) {
+	} else if ((tttBoard[0] == tttBoard[3]) && (tttBoard[0] == tttBoard[6]) && (tttBoard[0] != 'Z')) {
 		temp = true;
 		//cout << "wCondition 3" << endl;
-	} else if ((tttBoard[1] == tttBoard[4]) && (tttBoard[1] == tttBoard[7]) && (tttBoard[1] != ' ')) {
+	} else if ((tttBoard[1] == tttBoard[4]) && (tttBoard[1] == tttBoard[7]) && (tttBoard[1] != 'Z')) {
 		temp = true;
 		//cout << "wCondition 4" << endl;
-	} else if ((tttBoard[2] == tttBoard[5]) && (tttBoard[2] == tttBoard[8]) && (tttBoard[2] != ' ')) {
+	} else if ((tttBoard[2] == tttBoard[5]) && (tttBoard[2] == tttBoard[8]) && (tttBoard[2] != 'Z')) {
 		temp = true;
 		//cout << "wCondition 5" << endl;
-	} else if ((tttBoard[0] == tttBoard[1]) && (tttBoard[0] == tttBoard[2]) && (tttBoard[0] != ' ')) {
+	} else if ((tttBoard[0] == tttBoard[1]) && (tttBoard[0] == tttBoard[2]) && (tttBoard[0] != 'Z')) {
 		temp = true;
 		//cout << "wCondition 6" << endl;
-	} else if ((tttBoard[3] == tttBoard[4]) && (tttBoard[3] == tttBoard[5]) && (tttBoard[3] != ' ')) {
+	} else if ((tttBoard[3] == tttBoard[4]) && (tttBoard[3] == tttBoard[5]) && (tttBoard[3] != 'Z')) {
 		temp = true;
 		//cout << "wCondition 7" << endl;
-	} else if ((tttBoard[6] == tttBoard[7]) && (tttBoard[6] == tttBoard[8]) && (tttBoard[6] != ' ')) {
+	} else if ((tttBoard[6] == tttBoard[7]) && (tttBoard[6] == tttBoard[8]) && (tttBoard[6] != 'Z')) {
 		temp = true;
 		//cout << "wCondition 8" << endl;
 	} else {
@@ -133,6 +168,16 @@ void Game::displayBoard() {
 			cout << endl;
 		}
 	}
+}
+
+string Game::getBoardState() {
+	string boardState = "$BOARD";
+	
+	for (int i = 0; i < 9; i++) {
+		boardState = boardState + intToString(i) + tttBoard[i] + ",";
+	}	
+	
+	return boardState;
 }
 
 int Game::getNumberOfMoves() {
