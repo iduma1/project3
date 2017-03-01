@@ -35,12 +35,14 @@ int main() {
 	cout << "Enter your name:" << endl;
 	cin >> playerName;
 	sendfifo.send(playerName);
+	cout << "Sent: " << playerName << endl;
 	
 	string readyToPlay = "$GO" + playerName;
 	
-	//cout << "Enter a number between 0-8. These correspond to the positions on the tic tac toe board." << endl;
-	//cout << "The increase from left to right (e.g. 0 is the top left corner, 2 is the top right, 8 is the bottom right." << endl;
 	while (1) {
+	
+		//check whether or not the user has received "readyToGo" with their name attached.
+		
 		while (readyToGo(readyToPlay) == false) {
 			cout << "Waiting for my turn..." << endl;
 		}
@@ -48,15 +50,15 @@ int main() {
 		message = makeMessage(playerName);
 		sendfifo.send(message);
 		
-		recfifo.openread();
-		serverStatus = recfifo.recv();
-		recfifo.fifoclose();
+		cout << "Sent: " << message << endl;
 		
-		cout << "Secondary server status: " << serverStatus << endl;
-		while (error(serverStatus) == true) {
+		//cout << "Received: " << serverStatus << endl;
+		
+		/*while (error(serverStatus) == true) {
 			message = makeMessage(playerName);
-			sendfifo.send(message);			
-		} 
+			sendfifo.send(message);		
+			cout << "Sent: " << message << endl;	
+		}*/
 		if (win(playerName, serverStatus) == true) {
 			break;
 		}
@@ -93,6 +95,7 @@ bool readyToGo(string readyToPlay) {
 	recfifo.openread();
 	string serverStatus = recfifo.recv();
 	recfifo.fifoclose();
+	cout << "Received: " << serverStatus << endl;
 	if (serverStatus.find(readyToPlay) != -1) {
 		return true;
 	} else {
