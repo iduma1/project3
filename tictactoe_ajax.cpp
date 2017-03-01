@@ -30,14 +30,14 @@ std::string StringToUpper(std::string myString)
 }
 
 // fifo for communication
-string receive_fifo = "searchTermReply";
-string send_fifo = "searchTermRequest";
+string receive_fifo = "status";
+string send_fifo = "nextMove";
 
 int main() {
   Cgicc cgi;    // Ajax object
   char *cstr;
   // Create AJAX objects to recieve information from web page.
-  form_iterator searchTerm = cgi.getElement("searchTerm");//Word input
+  form_iterator searchTerm = cgi.getElement("username");//username input
 
   // create the FIFOs for communication
   Fifo recfifo(receive_fifo);
@@ -48,8 +48,8 @@ int main() {
   stword = StringToUpper(searchTerm);//Converts string to upper
   sendfifo.openwrite();
   sendfifo.send(stword);
-  
-  /* Get a message from a server 
+
+  /* Get a message from a server
   recfifo.openread();
   string results = recfifo.recv();
   recfifo.fifoclose();
@@ -57,6 +57,6 @@ int main() {
   cout << "Content-Type: text/plain\n\n";
 */
   cout << "What I got was" << **searchTerm;
-  
+
 return 0;
 }
