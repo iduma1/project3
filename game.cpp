@@ -9,6 +9,7 @@ Game::Game() {
     currentPlayer = 1;
     player1Wins = 0;
     player2Wins = 0;
+    numberOfMoves = 0;
 }
 
 
@@ -118,6 +119,7 @@ void Game::nextTurn() {
 	} else {
 		currentPlayer = 1;
 	}
+	numberOfMoves++;
 	//cout << "The value of currentPlayer is: " << currentPlayer << endl;
 }
 
@@ -131,6 +133,10 @@ void Game::displayBoard() {
 			cout << endl;
 		}
 	}
+}
+
+int Game::getNumberOfMoves() {
+	return numberOfMoves;
 }
 
 void Game::setPlayer1Name(string message) {

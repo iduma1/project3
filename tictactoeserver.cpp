@@ -22,7 +22,7 @@ string send_fifo = "status";
 Fifo recfifo(receive_fifo);
 Fifo sendfifo(send_fifo);
 
-enum state {noPlayer, onePlayer, twoPlayer, player1Turn, player2Turn, player1Win, player2Win, exitGame};
+enum state {noPlayer, onePlayer, twoPlayer, player1Turn, player2Turn, player1Win, player2Win, tie, exitGame};
 
 /* State machine functions */
 state noPlayerFn(Game& game);
@@ -32,6 +32,7 @@ state player1TurnFn(Game& game);
 state player2TurnFn(Game& game);
 state player1WinFn(Game& game);
 state player2WinFn(Game& game);
+state tieFn();
 
 int main() {
 
@@ -50,6 +51,8 @@ int main() {
 			case player1Turn: current = player1TurnFn(game);
 				break;
 			case player2Turn: current = player2TurnFn(game);
+				break;
+			case tie: current = tieFn();
 				break;
 			case player1Win: current = player1WinFn(game);
 				break;
@@ -103,7 +106,9 @@ state twoPlayerFn(Game& game) {
 
 state player1TurnFn(Game& game) {
 	string player2Name = game.getPlayer2Name();
-	string errorString = "$INVALID";
+	string player1Name = game.getPlayer1Name();
+	
+	string errorString = "$INVALID" + player1Name;
 	string readyToGo = "$GO" + player2Name;
 	
 	bool legitMove = true;
@@ -113,13 +118,6 @@ state player1TurnFn(Game& game) {
 	cout << "Received: " << message << endl;//retrieve input from player1
 	recfifo.fifoclose();					//close rec fifo
 	
-	/*if (message.find(player2Name) != -1) {
-		cout << "Error: " << player2Name << ", it isn't your turn!" << endl; 
-		legitMove = false;
-	} else {
-		legitMove = game.makeMove(message);
-	}*/
-	
 	legitMove = game.makeMove(message); //makes a move, but returns false if move is invalid
 	
 	game.displayBoard();
@@ -127,6 +125,12 @@ state player1TurnFn(Game& game) {
 	//if the move the user made was invalid, 
 	//send them an error and run through their turn again
 	if (legitMove == false) {
+	
+		sendfifo.openwrite();
+		sendfifo.send(errorString);
+		cout << "Sent: " << errorString << endl;
+		sendfifo.fifoclose();
+		
 		sendfifo.openwrite();
 		sendfifo.send(errorString);
 		cout << "Sent: " << errorString << endl;
@@ -137,6 +141,11 @@ state player1TurnFn(Game& game) {
 	//if the move was valid, and it wasn't a winning move
 	//send "ready to go" with player 2's name attached
 	else if (game.checkWin() != true) {
+	
+		int moves = game.getNumberOfMoves();
+		if (moves > 8) {
+			return tie;
+		}
 		
 		sendfifo.openwrite();
 		sendfifo.send(readyToGo);
@@ -161,7 +170,9 @@ state player1TurnFn(Game& game) {
 
 state player2TurnFn(Game& game) {
 	string player1Name = game.getPlayer1Name();
-	string errorString = "$INVALID";
+	string player2Name = game.getPlayer2Name();
+	
+	string errorString = "$INVALID" + player2Name;
 	string readyToGo = "$GO" + player1Name;
 
 	bool legitMove = true;
@@ -170,13 +181,6 @@ state player2TurnFn(Game& game) {
 	string message = recfifo.recv(); 		//open rec fifo
 	cout << "Received: " << message << endl;//receive input from player2
 	recfifo.fifoclose();					//close rec fifo
-		
-	/*if (message.find(player1Name) != -1) {
-		cout << "Error: " << player1Name << ", it isn't your turn!" << endl; 
-		legitMove = false;
-	} else {
-		legitMove = game.makeMove(message);
-	}*/
 	
 	legitMove = game.makeMove(message); //makes a move, but returns false if move is invalid
 	
@@ -185,10 +189,17 @@ state player2TurnFn(Game& game) {
 	//if the move the user made was invalid, 
 	//send them an error and run through their turn again
 	if (legitMove == false) {
+	
 		sendfifo.openwrite();
 		sendfifo.send(errorString);
 		cout << "Sent: " << errorString << endl;
 		sendfifo.fifoclose();
+		
+		sendfifo.openwrite();
+		sendfifo.send(errorString);
+		cout << "Sent: " << errorString << endl;
+		sendfifo.fifoclose();
+		
 		return player2Turn; //go back to player 2's turn
 		
 	//if the move was valid, and it wasn't a winning move
@@ -217,14 +228,21 @@ state player2TurnFn(Game& game) {
 
 state player1WinFn(Game& game) {
 	string player1Name = game.getPlayer1Name();
+			
 	string winString = "$WIN" + player1Name;
 
 	sendfifo.openwrite();
 	sendfifo.send(winString);
+	cout << "Sent: " << winString << endl;
+	sendfifo.fifoclose();
+	
+	sendfifo.openwrite();
+	sendfifo.send(winString);
+	cout << "Sent: " << winString << endl;
 	sendfifo.fifoclose();
 
-	cout << "Player 1 won!" << endl;
-	cout << "Player 2 lost!" << endl;
+	//cout << "Player 1 won!" << endl;
+	//cout << "Player 2 lost!" << endl;
 	return exitGame;
 }
 
@@ -234,9 +252,31 @@ state player2WinFn(Game& game) {
 
 	sendfifo.openwrite();
 	sendfifo.send(winString);
+	cout << "Sent: " << winString << endl;
+	sendfifo.fifoclose();
+	
+	sendfifo.openwrite();
+	sendfifo.send(winString);
+	cout << "Sent: " << winString << endl;
 	sendfifo.fifoclose();
 
-	cout << "Player 2 won!" << endl;
-	cout << "Player 1 lost!" << endl;
+	//cout << "Player 2 won!" << endl;
+	//cout << "Player 1 lost!" << endl;
+	return exitGame;
+}
+
+state tieFn() {
+	string tieString = "$TIE";
+	
+	sendfifo.openwrite();
+	sendfifo.send(tieString);		
+	cout << "Sent: " << tieString << endl;
+	sendfifo.fifoclose();
+	
+	sendfifo.openwrite();
+	sendfifo.send(tieString);
+	cout << "Sent: " << tieString << endl;
+	sendfifo.fifoclose();
+	
 	return exitGame;
 }

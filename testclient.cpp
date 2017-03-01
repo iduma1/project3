@@ -20,9 +20,7 @@ string send_fifo = "nextMove";
 Fifo recfifo(receive_fifo);
 Fifo sendfifo(send_fifo);
 
-bool error(string serverStatus);
-bool win(string playerName, string serverStatus);
-bool readyToGo(string readyToPlay);
+bool checkStatus(string playerName, bool& youWon, bool& youLost, bool& tie);
 string makeMessage(string playerName);
 
 int main() {
@@ -36,67 +34,60 @@ int main() {
 	cin >> playerName;
 	sendfifo.send(playerName);
 	cout << "Sent: " << playerName << endl;
-	
-	string readyToPlay = "$GO" + playerName;
-	
+		
 	while (1) {
 	
 		//check whether or not the user has received "readyToGo" with their name attached.
+		bool youWon = false;
+		bool youLost = false;
+		bool tie = false;
 		
-		while (readyToGo(readyToPlay) == false) {
+		while (checkStatus(playerName, youWon, youLost, tie) == false) {
 			cout << "Waiting for my turn..." << endl;
+		}
+		
+		if (youWon == true) {
+			cout << "You won! Congratulations!" << endl;
+			break;
+		} else if (youLost == true) {
+			cout << "You lost! Sorry :(" << endl;
+			break;
+		} else if (tie == true) {
+			cout << "It's a tie! Lame." << endl;
+			break;
 		}
 
 		message = makeMessage(playerName);
 		sendfifo.send(message);
 		
 		cout << "Sent: " << message << endl;
-		
-		//cout << "Received: " << serverStatus << endl;
-		
-		/*while (error(serverStatus) == true) {
-			message = makeMessage(playerName);
-			sendfifo.send(message);		
-			cout << "Sent: " << message << endl;	
-		}*/
-		if (win(playerName, serverStatus) == true) {
-			break;
-		}
 	}
 	sendfifo.fifoclose();
 	cout << "Closing the fifo, ending the game." << endl;
 }
 
-bool error(string serverStatus) {
-	string errorString = "$INVALID";
-	if (serverStatus.find(errorString) != -1) {
-		cout << "Error. String that you sent was invalid." << endl;
-		return true;
-	} else {
-		return false;
-	}
-}
+bool checkStatus(string playerName, bool& youWon, bool& youLost, bool& tie) {
 
-bool win(string playerName, string serverStatus) {
+	string errorString = "$INVALID" + playerName;
+	string readyToPlay = "$GO" + playerName;
 	string player1String = "$WIN" + playerName;
 	string winString = "$WIN";
-	if (serverStatus.find(player1String) != -1) {
-		cout << "You," << playerName << ", won!" << endl;
-		return true;
-	} else if (serverStatus.find(winString) != -1) {
-		cout << "The other player won :(" << endl;
-		return true;
-	} else {
-		return false;
-	}
-}
-
-bool readyToGo(string readyToPlay) {
+	string tieString = "$TIE";
+	
 	recfifo.openread();
 	string serverStatus = recfifo.recv();
 	recfifo.fifoclose();
 	cout << "Received: " << serverStatus << endl;
-	if (serverStatus.find(readyToPlay) != -1) {
+	if (serverStatus.find(player1String) != -1) {
+		youWon = true;
+		return true;
+	} else if (serverStatus.find(winString) != -1) {
+		youLost = true;
+		return true;
+	} else if (serverStatus.find(tieString) != -1) {
+		tie = true;
+		return true;
+	} else if (serverStatus.find(readyToPlay) != -1 || serverStatus.find(errorString) != -1) {
 		return true;
 	} else {
 		return false;

@@ -13,6 +13,8 @@ public:
     void setPlayer2Name(string message);    
     string getPlayer2Name();
     
+    int getNumberOfMoves();
+    
     void clearBoard();
 
     bool makeMove(string message);
@@ -37,6 +39,8 @@ private:
     string player1Name;
     
     string player2Name;
+    
+    int numberOfMoves;
     
 };
 
