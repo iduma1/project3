@@ -34,6 +34,9 @@ state player1WinFn(Game& game);
 state player2WinFn(Game& game);
 state tieFn();
 
+string parseName(string message);
+string parseCoord(string message);
+
 int main() {
 
 	Game game;
@@ -64,11 +67,40 @@ int main() {
 	return 0;
 }
 
+string parseName(string message) {
+	
+	//find first $
+	int start = message.find_first_of("$");
+	//cout << start << endl;
+	//find second $
+	int end = message.find_last_of("$");
+	//cout << end << endl;
+	
+	string name = message.substr(start + 1, end - 1);
+	cout << "Name is: " << name << endl;
+	return name;
+	
+}
+
+string parseCoord(string message) {
+	
+	//find last $
+	int second = message.find_last_of("$");
+	//cout << second << endl;
+	
+	string coord = message.substr(second + 1);
+	cout << "Coord is: " << coord << endl;
+	return coord;
+}
+
 state noPlayerFn(Game& game) {
 	cout << "No players connected" << endl;
 	recfifo.openread();						//Open rec fifo
-	string player1Name = recfifo.recv();			
-	cout << "Received: " << player1Name << endl;
+	string message = recfifo.recv();
+	cout << "Received: " << message << endl;
+	
+	string player1Name = parseName(message);
+	
 	game.setPlayer1Name(player1Name);		//store player 1 name
 	recfifo.fifoclose();					//close rec fifo
 	return onePlayer;
@@ -76,8 +108,11 @@ state noPlayerFn(Game& game) {
 
 state onePlayerFn(Game& game) {
 	recfifo.openread();						//Open rec fifo
-	string player2Name = recfifo.recv();
-	cout << "Received: " << player2Name << endl;
+	string message = recfifo.recv();
+	cout << "Received: " << message << endl;
+	
+	string player2Name = parseName(message);
+	
 	game.setPlayer2Name(player2Name);		//store player 2 name
 	recfifo.fifoclose();					//close rec fifo
 	return twoPlayer;
@@ -143,7 +178,7 @@ state player1TurnFn(Game& game) {
 	else if (game.checkWin() != true) {
 	
 		int moves = game.getNumberOfMoves();
-		if (moves > 8) {
+		if (moves > 8) { //max possible moves
 			return tie;
 		}
 		

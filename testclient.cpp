@@ -36,8 +36,7 @@ int main() {
 	cout << "Sent: " << playerName << endl;
 		
 	while (1) {
-	
-		//check whether or not the user has received "readyToGo" with their name attached.
+
 		bool youWon = false;
 		bool youLost = false;
 		bool tie = false;
