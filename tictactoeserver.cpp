@@ -34,6 +34,7 @@ state player1WinFn(Game& game);
 state player2WinFn(Game& game);
 state tieFn();
 
+/* Assisting functions */
 string parseName(string message);
 string parseCoord(string message);
 
@@ -69,27 +70,20 @@ int main() {
 
 string parseName(string message) {
 	
-	//find first $
+	//parse the message to find the player's name
 	int start = message.find_first_of("$");
-	//cout << start << endl;
-	//find second $
 	int end = message.find_last_of("$");
-	//cout << end << endl;
-	
 	string name = message.substr(start + 1, end - 1);
-	//cout << "Name is: " << name << endl;
-	return name;
 	
+	return name;
 }
 
 string parseCoord(string message) {
-	
-	//find last $
+
+	//parse the message to find the player's coordinate
 	int second = message.find_last_of("$");
-	//cout << second << endl;
-	
 	string coord = message.substr(second + 1);
-	//cout << "Coord is: " << coord << endl;
+
 	return coord;
 }
 
@@ -104,6 +98,7 @@ state noPlayerFn(Game& game) {
 	recfifo.fifoclose();					//close rec fifo
 	
 	cout << "Received: " << message << endl;
+	
 	string player1Name = parseName(message);	
 	game.setPlayer1Name(player1Name);		//store player 1 name
 	
@@ -138,20 +133,8 @@ state onePlayerFn(Game& game) {
 }
 
 state twoPlayerFn(Game& game) {
-
-	/*string player1Name = game.getPlayer1Name();*/
-	
-	cout << "Both players connected!" << endl;
-	
-	/*recfifo.openread();						//Open rec fifo
-	string message = recfifo.recv();		//receive the message
-	recfifo.fifoclose();					//close rec fifo
-	
-	sendfifo.openwrite();		//open send fifo
-	sendfifo.send(readyToPlay);	//send "ready" with player1's name attached
-	cout << "Sent: " << readyToPlay << endl;
-	sendfifo.fifoclose();		//close send fifo*/
 		
+	cout << "Both players connected!" << endl;
 	return player1Turn;
 }
 
@@ -159,22 +142,21 @@ state player1TurnFn(Game& game) {
 
 	string player2Name = game.getPlayer2Name();
 	string player1Name = game.getPlayer1Name();
-	
 	string boardState = game.getBoardState();
 	
 	bool legitMove = true;
 		
-	recfifo.openread();						//open rec fifo
+	//retrieve input from player1	
+	recfifo.openread();						
 	string message = recfifo.recv();		
-	cout << "Received: " << message << endl;//retrieve input from player1
-	recfifo.fifoclose();					//close rec fifo
+	cout << "Received: " << message << endl; 
+	recfifo.fifoclose();					
 	
-	string coord = parseCoord(message);
-	string messageSig = parseName(message);
+	string coord = parseCoord(message); //parse the coordinates
+	string messageSig = parseName(message); //parse the name
 	
-	//cout << "Player2's name is: " << player2Name << endl;
-	//cout << "messageSig is: " << messageSig << endl;
-	
+	//if you find player2's name in the message, then they're trying to make a move when
+	//it isn't their turn. Send them the same boardstate, and reset the function
 	if (messageSig == player2Name) {
 		sendfifo.openwrite();
 		sendfifo.send(boardState);
@@ -182,9 +164,6 @@ state player1TurnFn(Game& game) {
 		sendfifo.fifoclose();
 		return player1Turn;
 	}
-	
-	//here you can check which player sent the move by parsing the name and rejecting
-	//the call if you see the other player's name (then just return player1Turn again)
 	
 	legitMove = game.makeMove(coord); //makes a move, but returns false if move is invalid
 	boardState = game.getBoardState(); //get the boardstate after the move is made
@@ -201,7 +180,7 @@ state player1TurnFn(Game& game) {
 		return player1Turn; //go back to player 1's turn
 	} 
 	
-	//if the move was valid, and it wasn't a winning move, send the boardstate 
+	//else, if the move was valid, and it wasn't a winning move, send the boardstate 
 	else if (game.checkWin() != true) {
 	
 		int moves = game.getNumberOfMoves();
@@ -229,22 +208,21 @@ state player2TurnFn(Game& game) {
 
 	string player1Name = game.getPlayer1Name();
 	string player2Name = game.getPlayer2Name();
-	
 	string boardState = game.getBoardState();
 
 	bool legitMove = true;
-		
-	recfifo.openread();						//open rec fifo
+	
+	//retrieve input from player2
+	recfifo.openread();						
 	string message = recfifo.recv();		
-	cout << "Received: " << message << endl;//retrieve input from player1
-	recfifo.fifoclose();					//close rec fifo
+	cout << "Received: " << message << endl;
+	recfifo.fifoclose();					
 	
-	string coord = parseCoord(message);
-	string messageSig = parseName(message);
+	string coord = parseCoord(message); //parse the coordinate
+	string messageSig = parseName(message); //parse the player's name
 	
-	//cout << "Player1's name is: " << player1Name << endl;
-	//cout << "messageSig is: " << messageSig << endl;
-	
+	//if you find player1's name in the message, then they're trying to make a move when
+	//it isn't their turn. Send them the same boardstate, and reset the function
 	if (messageSig == player1Name) {
 		sendfifo.openwrite();
 		sendfifo.send(boardState);
@@ -252,13 +230,10 @@ state player2TurnFn(Game& game) {
 		sendfifo.fifoclose();
 		return player2Turn;
 	}
-	//here you can check which player sent the move by parsing the name and rejecting
-	//the call if you see the other player's name (then just return player1Turn again)
 	
 	legitMove = game.makeMove(coord); //makes a move, but returns false if move is invalid
 	boardState = game.getBoardState(); //get the boardstate after the move is made
 											  //regardless of the move's validity.
-		
 	game.displayBoard();
 	
 	//if the move the user made was invalid, send them the unchanged boardstate
@@ -267,20 +242,16 @@ state player2TurnFn(Game& game) {
 		sendfifo.openwrite();
 		sendfifo.send(boardState);
 		cout << "Sent: " << boardState << endl;
-		sendfifo.fifoclose();
-
-		
+		sendfifo.fifoclose();		
 		return player2Turn; //go back to player 2's turn
 		
-	//if the move was valid, and it wasn't a winning move, send the boardstate 
+	//else, if the move was valid, and it wasn't a winning move, send the boardstate 
 	} else if (game.checkWin() != true) {
 		
 		sendfifo.openwrite();
 		sendfifo.send(boardState);
 		cout << "Sent: " << boardState << endl;
 		sendfifo.fifoclose();
-
-
 		return player1Turn; //proceed to player 1's turn
 		
 	//if a win was detected, return a win for player 2.	
