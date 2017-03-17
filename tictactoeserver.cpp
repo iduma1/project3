@@ -32,7 +32,7 @@ state player1TurnFn(Game& game);
 state player2TurnFn(Game& game);
 state player1WinFn(Game& game);
 state player2WinFn(Game& game);
-state tieFn();
+state tieFn(Game& game);
 
 /* Assisting functions */
 string parseName(string message);
@@ -56,7 +56,7 @@ int main() {
 				break;
 			case player2Turn: current = player2TurnFn(game);
 				break;
-			case tie: current = tieFn();
+			case tie: current = tieFn(game);
 				break;
 			case player1Win: current = player1WinFn(game);
 				break;
@@ -265,7 +265,7 @@ state player2TurnFn(Game& game) {
 state player1WinFn(Game& game) {
 	string player1Name = game.getPlayer1Name();
 			
-	string winString = "$WIN" + player1Name;
+	string winString = game.getBoardState() + "$WIN$" + player1Name;
 
 	sendfifo.openwrite();
 	sendfifo.send(winString);
@@ -277,7 +277,7 @@ state player1WinFn(Game& game) {
 
 state player2WinFn(Game& game) {
 	string player2Name = game.getPlayer2Name();
-	string winString = "$WIN" + player2Name;
+	string winString = game.getBoardState() + "$WIN$" + player2Name;
 
 	sendfifo.openwrite();
 	sendfifo.send(winString);
@@ -289,8 +289,8 @@ state player2WinFn(Game& game) {
 	return exitGame;
 }
 
-state tieFn() {
-	string tieString = "$TIE";
+state tieFn(Game& game) {
+	string tieString = game.getBoardState() + "$TIE";
 	
 	sendfifo.openwrite();
 	sendfifo.send(tieString);		

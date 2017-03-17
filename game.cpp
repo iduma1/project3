@@ -171,9 +171,13 @@ void Game::displayBoard() {
 }
 
 string Game::getBoardState() {
-	string boardState = "$BOARD";
+	string boardState = "$BOARD$";
 	
 	for (int i = 0; i < 9; i++) {
+		if (i == 8) {
+			boardState = boardState + intToString(i) + tttBoard[i];
+			break;
+		}
 		boardState = boardState + intToString(i) + tttBoard[i] + ",";
 	}	
 	

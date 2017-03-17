@@ -26,6 +26,9 @@ string makeMessage(string playerName);
 int main() {
 
 	string playerName, message, serverStatus, position;
+	string winString = "$WIN";
+	string loseString = "$LOSE";
+	string tieString = "$TIE";
  
 	cout << "Opening send FIFO" << endl;
 	sendfifo.openwrite();
@@ -44,22 +47,33 @@ int main() {
 	recfifo.openread();
 	serverStatus = recfifo.recv();
 	recfifo.fifoclose();
-	cout << "Received: " << serverStatus << endl;
 	
 	bool youWon, youLost, tie;
+	
 	checkStatus(serverStatus, playerName, youWon, youLost, tie);
 	
-	if (youWon == true) {
-		cout << "You won! :)" << endl;
+	/*if (youWon == true) {
+		serverStatus += winString;
+		cout << serverStatus << endl;
 	} else if (youLost == true) {
-		cout << "You lost! :(" << endl;
+		serverStatus += loseString;
+		cout << serverStatus << endl;
 	} else if (tie == true) {
-		cout << "It's a tie. Lame." << endl;
-	}
+		serverStatus += tieString;
+		cout << serverStatus << endl;
+	}*/
+	
+	cout << "Received: " << serverStatus << endl;
+	
+	
 	return 0;
 }
 
 void checkStatus(string status, string playerName, bool& youWon, bool& youLost, bool& tie) {
+
+	youWon = false;
+	youLost = false;
+	tie = false;
 
 	string player1String = "$WIN" + playerName;
 	string winString = "$WIN";
