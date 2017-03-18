@@ -21,7 +21,6 @@ testclient.o: testclient.cpp fifo.h
 tictactoeserver.o: tictactoeserver.cpp fifo.h
 	$(CC) -c $(CFLAGS) tictactoeserver.cpp
 
-
 testclient: testclient.o fifo.o
 	$(CC) testclient.o fifo.o -o testclient
 
@@ -30,10 +29,14 @@ tictactoeserver: tictactoeserver.o fifo.o game.o
 
 fifo.o:	fifo.cpp fifo.h
 	g++ -c fifo.cpp
+
 game.o: game.cpp game.h
 	g++ -c game.cpp
 
-PutCGI: tictactoe_ajax.cpp
+tictactoe_ajax: tictactoe_ajax.o fifo.h
+	$(CC) tictactoe_ajax.o fifo.o -o tictactoe_ajax -L/usr/local/lib -lcgicc
+
+PutCGI: tictactoe_ajax
 	chmod 757 tictactoe_ajax
 	cp tictactoe_ajax /usr/lib/cgi-bin/$(USER)_tictactoe_ajax.cgi 
 
