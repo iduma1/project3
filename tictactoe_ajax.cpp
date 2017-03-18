@@ -15,19 +15,6 @@
 using namespace std;
 using namespace cgicc; // Needed for AJAX functions.
 
-//Indeed, myString needs to be a copy of the original string
-/*
-std::string StringToUpper(std::string myString)
-{
-  const int length = myString.length();
-  for(int i=0; i!=length ; ++i)
-    {
-      myString[i] = std::toupper(myString[i]);
-    }
-  return myString;
-}
-*/
-
 // fifo for communication
 string receive_fifo = "status";
 string send_fifo = "nextMove";
@@ -59,7 +46,7 @@ int main() {
 	recfifo.fifoclose();
 	sendfifo.fifoclose();
 
-	cout << "O,X,O,Z,Z,Z,O,X,O";//Prints out the board 
+	cout << board;//Prints out the board 
 
 return 0;
 }
