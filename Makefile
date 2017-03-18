@@ -2,7 +2,7 @@
 # For CSC3004 Software Development
 
 # Put your user name below:
-USER= wilhelmj
+USER= solorioc
 
 CC= g++
 
@@ -13,8 +13,7 @@ CFLAGS= -g
 
 RM= /bin/rm -f
 
-#all: tictactoeserver testclient PutCGI PutHTML
-all: tictactoeserver testclient 
+all: tictactoeserver testclient PutCGI PutHTML
 
 testclient.o: testclient.cpp fifo.h
 	$(CC) -c $(CFLAGS) testclient.cpp
@@ -34,23 +33,19 @@ fifo.o:	fifo.cpp fifo.h
 game.o: game.cpp game.h
 	g++ -c game.cpp
 
-		
-#tictactoeclient: namefetchajax.o  fifo.h
-#	$(CC) namefetchajax.o  fifo.o -o namefetchajax -L/usr/local/lib -lcgicc
-
-#PutCGI: tictactoeclient
-	#chmod 757 namefetchajaxmak
-	#cp namefetchajax /usr/lib/cgi-bin/$(USER)_namefetchajax.cgi 
+PutCGI: tictactoe_ajax.cpp
+	chmod 757 tictactoe_ajax
+	cp tictactoe_ajax /usr/lib/cgi-bin/$(USER)_tictactoe_ajax.cgi 
 
 	#echo "Current contents of your cgi-bin directory: "
-#	ls -l /usr/lib/cgi-bin/
+	#ls -l /usr/lib/cgi-bin/
 
-#PutHTML:
-	#cp name_stats_ajax.html /var/www/html/class/softdev/$(USER)
-	#cp name_stats_ajax.css /var/www/html/class/softdev/$(USER)
-
-	echo "Current contents of your HTML directory: "
-	ls -l /var/www/html/class/softdev/$(USER)
+PutHTML:
+	cp tictactoe_ajax.html /var/www/html/class/softdev/$(USER)
+	cp tictactoe_ajax.css /var/www/html/class/softdev/$(USER)
+	cp tictactoe_java.js /var/www/html/class/softdev/$(USER)
+	#echo "Current contents of your HTML directory: "
+	#ls -l /var/www/html/class/softdev/$(USER)
 
 clean:
-	rm -f *.o tictactoeserver testclient
+	rm -f *.o tictactoeserver testclient 
