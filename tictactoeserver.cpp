@@ -265,7 +265,7 @@ state player2TurnFn(Game& game) {
 state player1WinFn(Game& game) {
 	string player1Name = game.getPlayer1Name();
 			
-	string winString = game.getBoardState() + "$WIN$" + player1Name;
+	string winString = game.getBoardState() + ",WIN," + player1Name;
 
 	sendfifo.openwrite();
 	sendfifo.send(winString);
@@ -277,7 +277,7 @@ state player1WinFn(Game& game) {
 
 state player2WinFn(Game& game) {
 	string player2Name = game.getPlayer2Name();
-	string winString = game.getBoardState() + "$WIN$" + player2Name;
+	string winString = game.getBoardState() + ",WIN," + player2Name;
 
 	sendfifo.openwrite();
 	sendfifo.send(winString);
@@ -290,7 +290,7 @@ state player2WinFn(Game& game) {
 }
 
 state tieFn(Game& game) {
-	string tieString = game.getBoardState() + "$TIE";
+	string tieString = game.getBoardState() + ",TIE";
 	
 	sendfifo.openwrite();
 	sendfifo.send(tieString);		

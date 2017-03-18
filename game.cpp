@@ -171,14 +171,14 @@ void Game::displayBoard() {
 }
 
 string Game::getBoardState() {
-	string boardState = "$BOARD$";
+	string boardState;
 	
 	for (int i = 0; i < 9; i++) {
 		if (i == 8) {
-			boardState = boardState + intToString(i) + tttBoard[i];
-			break;
+			boardState = boardState + tttBoard[i];
+			break;			
 		}
-		boardState = boardState + intToString(i) + tttBoard[i] + ",";
+		boardState = boardState + tttBoard[i] + ",";
 	}	
 	
 	return boardState;
