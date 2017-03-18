@@ -1,69 +1,79 @@
+
+
 <html>
 <head>
-<title>Software Development - U.S. Census Name Data Demo Program</title>
-<META AUTHOR="Jim Skon">
+<title>Software Development - Two-Player Tic Tac Toe</title>
+<META AUTHOR="Christian Solorio">
 </head>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 
 <head>
-  <!-- $Id: name_stats_ajax.html,v 1.6 skon Exp $ -->
-<link rel="stylesheet" type="text/css" href="index_ajax.css">
-  <title>GNU cgicc Name Data Form</title>
+	<!-- $Id: name_stats_ajax.html,v 1.6 skon Exp $ -->
+	<link rel="stylesheet" type="text/css" href="tictactoe_ajax.css">
 </head>
 
-<script type = "text/javascript">
-var XMLHttp;
-if(navigator.appName == "Microsoft Internet Explorer") {
-    XMLHttp = new ActiveXObject("Microsoft.XMLHTTP");
-} else {
-    XMLHttp = new XMLHttpRequest();
-}
+<!-- Javascript! -->
+<script src="tictactoe_java.js"></script>
 
-function getresponse () {
-
-     var name = document.getElementById('name').value;		     
-     if (name.length < 1) return;
-
-    XMLHttp.open("GET", "/cgi-bin/solorioc_indexsearchajax.cgi?"
-						 + "&name=" + name
-						 ,true);
-    XMLHttp.onreadystatechange=function() {
-
-    document.getElementById('response_area').innerHTML = 
-XMLHttp.responseText;
-
-    }
-	XMLHttp.send(null);
-}
-
-</script>
 
 <body>
+	<div id="playerNames">
+		<h2 id="p1">...</h2> <h2 id ="vs">vs</h2> <h2 id="p2">Opponent</h2>
+	</div>
+	
+	<div id = "board">
+		<table border="0" cellpadding="0" cellspacing="0">
+			<tbody>
+		
+				<tr>
+					<td>
+						<div id = "UL" type="button" onclick="javascript: callCGI(0)"></div>
+					</td>
+				
+					<td>
+						<div id = "UM" type="button" onclick="javascript: callCGI(1)"></div>
+					</td>
+				
+					<td>
+						<div id = "UR" type="button" onclick="javascript: callCGI(2)"></div>
+					</td>
+				
+				</tr>
+				
+				<tr>
+					<td>
+						<div id = "ML" type="button" onclick="javascript: callCGI(3)"></div>
+					</td>
+				
+					<td>
+						<div id = "MM" type="button" onclick="javascript: callCGI(4)"></div>
+					</td>
+				
+					<td>
+						<div id = "MR" type="button" onclick="javascript: callCGI(5)"></div>
+					</td>
+				</tr>
+			
+				<tr>
+					<td>
+						<div id = "LL" type="button" onclick="javascript: callCGI(6)"></div>
+					</td>
+				
+					<td>
+						<div id = "LM" type="button" onclick="javascript: callCGI(7)"></div>
+					</td>
+				
+					<td>
+						<div id = "LR" type="button" onclick="javascript: callCGI(8)"></div>
+					</td>
+				</tr>
+			
+			</tbody>
+		</table>
 
-<div id="intro">
-<h1>Software Development - Index of Shakespeare's Complete Works</h1>
-<p>This program is designed to demonstrate a simple client/server program. 
-A server program runs in the background, waiting for a search requests.  When it receives a search request
-it returns the lines that contain the searched word. 
-<p>  The reason for such a architecture is to allow a simple program, with a MAP preloaded with data,
-to quickly provide results without incurring the overhead of a reloading the texts for each request. 
-<br> (Written by Jim Skon, Modified by Christian Solorio)
-</div>
-
-<p>
-<hr>
-Word to search for:  
-<input name="name" type="text" id=name maxlength=30></td>
-<p>
-
-<input type="button" onclick="javascript: getresponse ()" name="submit" value="Submit" />
-</p>
-
-<div id = "response_area">
-
-</div>
-
-
+	</div>
+	
+	<button onclick="javascript: displayBoard('O,X,O,X,O,X,O,X,O,TIE')">TEST BOARD STATE</button>
 
 </body>
 </html>
