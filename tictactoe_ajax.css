@@ -1,24 +1,104 @@
-<STYLE TYPE-"type/css">
-
-BODY {background: #d3d3d3}
-A:link {color: #80FF00}
-A:visited {color: #FF00FF}
-H1 {font-size: 24pt; font-family: arial}
-H2 {font-size: 18pt; font-family: braggadocio}
-H3 {font size:14pt; font-family: desdemona}
+body {
+	background: radial-gradient(#7E57C2,#512DA8);
+	font-family: Roboto, Arial;
+}
 
 table {
-    font-family: arial, sans-serif;
-    border-collapse: collapse;
+	border-spacing: 0;
+	cellspacing: 0;
+	cellpadding: 0;
+	margin: 80px auto; 
 }
 
-td, th {
-    border: 1px solid #dddddd;
-    text-align: left;
-    padding: 8px;
+#turn {
+	color: #ffffff;
+	text-align: center;
+	margin-top: -50px;
 }
 
-tr:nth-child(even) {
-    background-color: #dddddd;
+#playerNames {
+	color: #ffffff;
+	text-align: center;
+	margin-top: 0px;
+	margin-bottom: -22px;	
 }
-</STYLE>
+
+#p1 {display: inline;}
+#p2 {display: inline;}
+#vs{display: inline;}
+
+#UL {
+	height: 150px;
+	width: 150px;
+	padding: 0px;
+	
+	border-right: 10px solid #ffffff;
+	border-bottom: 10px solid #ffffff
+}
+
+#UM {
+	height: 150px;
+	width: 150px;
+	padding: 0px;
+	border-bottom: 10px solid #ffffff;
+}
+
+#UR {
+
+	height: 150px;
+	width: 150px;
+	padding: 0px;
+	border-left: 10px solid #ffffff;
+	border-bottom: 10px solid #ffffff;
+}
+
+#ML {
+	
+	height: 150px;
+	width: 150px;
+	padding: 0px;
+	
+	border-right: 10px solid #ffffff;
+	border-bottom: 10px solid #ffffff
+}
+
+#MM {
+
+	height: 150px;
+	width: 150px;
+	padding: 0px;
+	border-bottom: 10px solid #ffffff;
+}
+
+#MR {
+
+	height: 150px;
+	width: 150px;
+	padding: 0px;
+	border-left: 10px solid #ffffff;
+	border-bottom: 10px solid #ffffff;
+}
+
+#LL {
+	
+	height: 150px;
+	width: 150px;
+	padding: 0px;
+	
+	border-right: 10px solid #ffffff;
+}
+
+#LM {
+
+	height: 150px;
+	width: 150px;
+	padding: 0px;
+}
+
+#LR {
+
+	height: 150px;
+	width: 150px;
+	padding: 0px;
+	border-left: 10px solid #ffffff;
+}
