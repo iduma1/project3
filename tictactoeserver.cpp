@@ -141,6 +141,8 @@ state twoPlayerFn(Game& game) {
 
 state player1TurnFn(Game& game) {
 
+	string getUpdate = "$update$10";
+
 	string player2Name = game.getPlayer2Name();
 	string player1Name = game.getPlayer1Name();
 	string boardState = game.getBoardState();
@@ -152,6 +154,14 @@ state player1TurnFn(Game& game) {
 	string message = recfifo.recv();		
 	cout << "Received: " << message << endl; 
 	recfifo.fifoclose();					
+	
+	if (message == getUpdate) {
+		sendfifo.openwrite();
+		sendfifo.send(boardState);
+		cout << "Sent: " << boardState << endl;
+		sendfifo.fifoclose();
+		return player1Turn;
+	}
 	
 	string coord = parseCoord(message); //parse the coordinates
 	string messageSig = parseName(message); //parse the name
@@ -207,6 +217,8 @@ state player1TurnFn(Game& game) {
 
 state player2TurnFn(Game& game) {
 
+	string getUpdate = "$update$10";
+
 	string player1Name = game.getPlayer1Name();
 	string player2Name = game.getPlayer2Name();
 	string boardState = game.getBoardState();
@@ -217,7 +229,15 @@ state player2TurnFn(Game& game) {
 	recfifo.openread();						
 	string message = recfifo.recv();		
 	cout << "Received: " << message << endl;
-	recfifo.fifoclose();					
+	recfifo.fifoclose();	
+	
+	if (message == getUpdate) {
+		sendfifo.openwrite();
+		sendfifo.send(boardState);
+		cout << "Sent: " << boardState << endl;
+		sendfifo.fifoclose();
+		return player2Turn;
+	}				
 	
 	string coord = parseCoord(message); //parse the coordinate
 	string messageSig = parseName(message); //parse the player's name
