@@ -41,6 +41,7 @@ string parseCoord(string message);
 int main() {
 
 	Game game;
+	game.initializeBoard();
 	state current = noPlayer;
 	
 	cout << "Waiting for people to connect..." << endl;
@@ -62,7 +63,7 @@ int main() {
 				break;
 			case player2Win: current = player2WinFn(game);
 				break;
-			case exitGame: return 0;
+			case exitGame: current = noPlayerFn(game);
 		}
 	}
 	return 0;

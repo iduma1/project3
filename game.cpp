@@ -72,6 +72,12 @@ int Game::stringToInt(string message) {
 
 void Game::clearBoard() {
 	for (int i = 0; i < 9; i++) {
+		tttBoard[i] = 'Z';
+	}
+}
+
+void Game::initializeBoard() {
+	for (int i = 0; i < 9; i++) {
 		tttBoard.push_back('Z');
 	}
 }

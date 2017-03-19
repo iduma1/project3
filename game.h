@@ -20,6 +20,8 @@ public:
     string intToString(int i);
 	int stringToInt(string message);
     
+    void initializeBoard();
+    
     void clearBoard();
 
     bool makeMove(string message);
