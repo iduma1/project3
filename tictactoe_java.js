@@ -15,17 +15,24 @@
 var XMLHttp;
 var cgiBusy = false;//Stores state of CGI (busy or not busy)
 var pname; //Stores the player's name
+var boardState="Z,Z,Z,Z,Z,Z,Z,Z,Z";//Stores the current state of the board
 
+/*Uses the callCGI function to update the board every 5 seconds*/
+setInterval(function(){ 
+	callCGI(10);//pos=10 means update the board
+},5000);
+
+/*XMLHttp object definition based on the web browser*/
 if(navigator.appName == "Microsoft Internet Explorer") {
     XMLHttp = new ActiveXObject("Microsoft.XMLHTTP");
 } else {
     XMLHttp = new XMLHttpRequest();
 }
 
-//Function that will send and receive messages from the ajax program
+//Function that will send and receive messages from the ajax program. When pos=10, we are requesting an update of the board.
 function callCGI(pos) {
 	
-	if (cgiBusy === true) {//If the CGI is busy, this function quits
+	if (cgiBusy == true) {//If the CGI is busy, this function quits
 	
 		return;
 		
@@ -33,15 +40,24 @@ function callCGI(pos) {
 	
 		cgiBusy = true;//Change CGI state to busy
 		
+		if(pos==10) {//When pos is 10, we simply are updating the board. We don't want a player sending a move.
+			XMLHttp.open("GET", "/cgi-bin/solorioc_tictactoe_ajax.cgi?"
+						 +"&player=" + "update"
+						 +"&pos=" + pos
+						 ,true);
+		}else {
+		
 		XMLHttp.open("GET", "/cgi-bin/solorioc_tictactoe_ajax.cgi?"
 						 +"&player=" + pname
 						 +"&pos=" + pos
 						 ,true);
-			 
+		}
+		
 		XMLHttp.onreadystatechange = function() {//Reads in the board state
 		
-			if (XMLHttp.readyState == 4) {			
-				displayBoard(XMLHttp.responseText);
+			if (XMLHttp.readyState === 4) {
+				boardState = XMLHttp.responseText;
+				displayBoard(boardState);
 			}
 		}
 	
@@ -88,13 +104,13 @@ function displayBoard(board) {
 	
 	if (splits.length >= 9) {
 		if(splits[9]=="TIE") {//If the TIE string is in the array,
-			alert("Tie Game!");//Alerts user
-			location.reload();//Refreshes page to start new game
+			gameStatus.innerText = "Tie Game!";
+			document.getElementById("gameOver").style.visibility="visible";
 		}
 		
 		if(splits[9]=="WIN") {//If the WIN string is in the array, 
-			alert(splits[10]+" won!");//Tells each person who won
-			location.reload();
+			gameStatus.innerText = splits[10]+ " won!";
+			document.getElementById("gameOver").style.visibility="visible";
 		}
 	}
 	
@@ -103,5 +119,6 @@ function displayBoard(board) {
 window.onload = function getName() {
 		pname = prompt("Enter Your Name", "player");//On entering the website, a player enters their name	
 		p1.innerText = pname;//Displays the players name on the screen
-		callCGI(0);//Sends a call out to the CGI program that a player has connected
+		callCGI(10);//Sends a call out to the CGI program that a player has connected
 }
+

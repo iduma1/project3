@@ -9,13 +9,13 @@ table {
 	cellpadding: 0;
 	margin: 80px auto; 
 }
-
+/*
 #turn {
 	color: #ffffff;
 	text-align: center;
 	margin-top: -50px;
 }
-
+*/
 #playerNames {
 	color: #ffffff;
 	text-align: center;
@@ -102,3 +102,10 @@ table {
 	padding: 0px;
 	border-left: 10px solid #ffffff;
 }
+
+#gameOver {
+	color: #ffffff;
+	text-align: center;
+	visibility: hidden;
+}
+

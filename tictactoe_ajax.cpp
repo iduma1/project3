@@ -15,13 +15,26 @@
 using namespace std;
 using namespace cgicc; // Needed for AJAX functions.
 
+//Indeed, myString needs to be a copy of the original string
+/*
+std::string StringToUpper(std::string myString)
+{
+  const int length = myString.length();
+  for(int i=0; i!=length ; ++i)
+    {
+      myString[i] = std::toupper(myString[i]);
+    }
+  return myString;
+}
+*/
+
 // fifo for communication
 string receive_fifo = "status";
 string send_fifo = "nextMove";
 
 int main() {
 
-	Cgicc cgi;    // Ajax object
+	Cgicc cgi;// Ajax object
 	char *cstr;
 
 	// Create AJAX objects to recieve information from web page.
@@ -45,7 +58,8 @@ int main() {
 	/*Move 'em out, Close 'em up rawhide*/
 	recfifo.fifoclose();
 	sendfifo.fifoclose();
-
+	
+	cout << "Content-Type: text/plain\n\n";
 	cout << board;//Prints out the board 
 
 return 0;
