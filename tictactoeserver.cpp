@@ -101,6 +101,11 @@ state noPlayerFn(Game& game) {
 	cout << "Received: " << message << endl;
 	
 	string player1Name = parseName(message);	
+	
+	if (player1Name == "update") {
+		return noPlayer;
+	}
+	
 	game.setPlayer1Name(player1Name);		//store player 1 name
 	
 	string boardState = game.getBoardState();
@@ -120,7 +125,13 @@ state onePlayerFn(Game& game) {
 	recfifo.fifoclose();					//close rec fifo
 	
 	cout << "Received: " << message << endl;
+	
 	string player2Name = parseName(message);
+	
+	if (player2Name == "update") {
+		return onePlayer;
+	}
+	
 	game.setPlayer2Name(player2Name);		//store player 2 name
 	
 	string boardState = game.getBoardState();
