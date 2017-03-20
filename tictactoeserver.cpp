@@ -100,15 +100,18 @@ state noPlayerFn(Game& game) {
 	
 	cout << "Received: " << message << endl;
 	
+	string boardState = game.getBoardState();
 	string player1Name = parseName(message);	
 	
 	if (player1Name == "update") {
+		sendfifo.openwrite();
+		sendfifo.send(boardState);
+		cout << "Sent: " << boardState << endl;
+		sendfifo.fifoclose();
 		return noPlayer;
 	}
 	
 	game.setPlayer1Name(player1Name);		//store player 1 name
-	
-	string boardState = game.getBoardState();
 	
 	sendfifo.openwrite();					//open send fifo
 	sendfifo.send(boardState);				//send the boardstate
@@ -126,16 +129,19 @@ state onePlayerFn(Game& game) {
 	
 	cout << "Received: " << message << endl;
 	
+	string boardState = game.getBoardState();
 	string player2Name = parseName(message);
 	
 	if (player2Name == "update") {
+		sendfifo.openwrite();
+		sendfifo.send(boardState);
+		cout << "Sent: " << boardState << endl;
+		sendfifo.fifoclose();
 		return onePlayer;
 	}
 	
 	game.setPlayer2Name(player2Name);		//store player 2 name
-	
-	string boardState = game.getBoardState();
-	
+		
 	sendfifo.openwrite();					//open send fifo
 	sendfifo.send(boardState);				//send the boardstate
 	sendfifo.fifoclose();					//close send fifo
