@@ -15,6 +15,8 @@ public:
     
     int getNumberOfMoves();
     
+    int getCurrentPlayer();
+    
     string getBoardState();
     
     string intToString(int i);
@@ -27,6 +29,8 @@ public:
     bool makeMove(string message);
 
     bool checkWin();
+    
+    bool checkTie();
 
     void nextTurn();
     
