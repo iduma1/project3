@@ -24,14 +24,17 @@ tictactoeserver.o: tictactoeserver.cpp fifo.h
 testclient: testclient.o fifo.o
 	$(CC) testclient.o fifo.o -o testclient
 
-tictactoeserver: tictactoeserver.o fifo.o game.o
-	$(CC) tictactoeserver.o  fifo.o game.o -o tictactoeserver 
+tictactoeserver: tictactoeserver.o fifo.o game.o player.o
+	$(CC) tictactoeserver.o  fifo.o game.o player.o -o tictactoeserver 
 
 fifo.o:	fifo.cpp fifo.h
 	g++ -c fifo.cpp
 
 game.o: game.cpp game.h
 	g++ -c game.cpp
+	
+player.o: player.cpp player.h
+	g++ -c player.cpp
 
 tictactoe_ajax: tictactoe_ajax.o fifo.h
 	$(CC) tictactoe_ajax.o fifo.o -o tictactoe_ajax -L/usr/local/lib -lcgicc
