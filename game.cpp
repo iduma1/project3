@@ -152,6 +152,14 @@ bool Game::checkWin() {
 	}
 }
 
+bool Game::checkTie() {
+	if (numberOfMoves > 8) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
 void Game::nextTurn() {
 	if (currentPlayer == 1) {
 		currentPlayer = 2;
@@ -192,6 +200,10 @@ string Game::getBoardState() {
 
 int Game::getNumberOfMoves() {
 	return numberOfMoves;
+}
+
+int Game::getCurrentPlayer() {
+	return currentPlayer;
 }
 
 void Game::setPlayer1Name(string message) {

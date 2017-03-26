@@ -12,3 +12,7 @@ Player::Player() {
 void Player::setPlayerName(string message) {
 	playerName = message;
 }
+
+string Player::getPlayerName() {
+	return playerName;
+}

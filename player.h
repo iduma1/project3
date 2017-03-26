@@ -11,9 +11,6 @@ public:
     void setPlayerName(string message);    
     string getPlayerName();
     
-    void setPlayer2Name(string message);    
-    string getPlayer2Name();
-    
 private:        
    
    string playerName;
