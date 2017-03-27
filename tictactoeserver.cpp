@@ -23,11 +23,11 @@ string send_fifo = "status";
 Fifo recfifo(receive_fifo);
 Fifo sendfifo(send_fifo);
 
-enum state {noPlayer, onePlayer, twoPlayer, takeTurn, player1Win, player2Win, win, tie, exitGame};
+enum state {noPlayer, onePlayer, twoPlayer, takeTurn, win, tie, exitGame};
 
 /* State machine functions */
 state noPlayerFn(Game& game, Player& player1);
-state onePlayerFn(Game& game, Player& player2);
+state onePlayerFn(Game& game, Player player1, Player& player2);
 state twoPlayerFn(Game& game);
 state takeTurnFn(Game& game, Player player);
 state player1TurnFn(Game& game);
@@ -36,6 +36,7 @@ state player1WinFn(Game& game);
 state player2WinFn(Game& game);
 state winFn(Game& game, Player player);
 state tieFn(Game& game);
+state exitGameFn(Game& game, Player player);
 
 /* Assisting functions */
 string parseName(string message);
@@ -57,15 +58,15 @@ int main() {
 		switch (current) {
 			case noPlayer:	current = noPlayerFn(game, player1);
 				break;
-			case onePlayer: current = onePlayerFn(game, player2);
+			case onePlayer: current = onePlayerFn(game, player1, player2);
 				break;
 			case twoPlayer: current = twoPlayerFn(game);
 				break;
 			case takeTurn: 
 				if (game.getCurrentPlayerValue() == 0) {
-					current = takeTurnFn(game, player1);
-				} else if (game.getCurrentPlayerValue() == 1) {
 					current = takeTurnFn(game, player2);
+				} else if (game.getCurrentPlayerValue() == 1) {
+					current = takeTurnFn(game, player1);
 				}
 				break;
 			case win: 
@@ -77,7 +78,13 @@ int main() {
 				break;
 			case tie: current = tieFn(game);
 				break;
-			case exitGame: current = noPlayerFn(game, player1);
+			case exitGame: 
+				if (game.getCurrentPlayerValue() == 0) {
+					current = exitGameFn(game, player2);
+				} else if (game.getCurrentPlayerValue() == 1) {
+					current = exitGameFn(game, player1);
+				}
+				break;
 		}
 	}
 	return 0;
@@ -114,8 +121,8 @@ state noPlayerFn(Game& game, Player& player1) {
 	
 	cout << "Received: " << message << endl;
 	
-	string boardState = game.getBoardState();
-	string player1Name = parseName(message);	
+	string player1Name = parseName(message);
+	string boardState = game.getBoardState() + ",onePlayer";
 	
 	if (player1Name == "update") {
 		sendfifo.openwrite();
@@ -135,7 +142,7 @@ state noPlayerFn(Game& game, Player& player1) {
 	return onePlayer;
 }
 
-state onePlayerFn(Game& game, Player& player2) {
+state onePlayerFn(Game& game, Player player1, Player& player2) {
 
 	recfifo.openread();						//Open rec fifo
 	string message = recfifo.recv();		//receive the message
@@ -143,8 +150,9 @@ state onePlayerFn(Game& game, Player& player2) {
 	
 	cout << "Received: " << message << endl;
 	
-	string boardState = game.getBoardState();
+	string player1Name = player1.getPlayerName();
 	string player2Name = parseName(message);
+	string boardState = game.getBoardState() + "," + player1.getPlayerName();
 	
 	if (player2Name == "update") {
 		sendfifo.openwrite();
@@ -184,7 +192,7 @@ state takeTurnFn(Game& game, Player player) {
 	
 	//if the player's name isn't in the message or if the server is asking for an update, 
 	//we don't want to make their move, so just send them an unchanged boardstate and come back to this function again	
-	if (messageSig != player.getPlayerName() || message == getUpdate) {
+	if (messageSig == player.getPlayerName() || message == getUpdate) {
 		cout << "Sending an unchanged boardstate." << endl;
 		sendfifo.openwrite();
 		sendfifo.send(boardState);
@@ -196,7 +204,7 @@ state takeTurnFn(Game& game, Player player) {
 	//otherwise, make their move
 	string coord = parseCoord(message); //parse the coordinates from the message
 	game.makeMove(coord); //make the move using the received coordinate
-	boardState = game.getBoardState(); //get the boardstate afterwards
+	boardState = game.getBoardState() + ',' + player.getPlayerName(); //get the boardstate afterwards, prep the message to send to server
 	game.displayBoard(); //show the boardstate
 	
 	//check for a tie or a win, otherwise send back the boardstate
@@ -242,4 +250,26 @@ state tieFn(Game& game) {
 	sendfifo.fifoclose();
 	
 	return exitGame;
+}
+
+state exitGameFn(Game& game, Player player) {
+	
+	recfifo.openread();
+	string message = recfifo.recv();
+	recfifo.fifoclose();
+	
+	string winString = game.getBoardState() + ",WIN," + player.getPlayerName();
+	sendfifo.openwrite();
+	sendfifo.send(winString);
+	sendfifo.fifoclose();
+	cout << "Sent: " << winString << endl;
+	
+	return noPlayer;
+	
+	/*if (message == playAgain!!) {
+		return noPlayer;
+	} else {
+		return exitGame;
+	}*/
+	
 }
