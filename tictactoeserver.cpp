@@ -23,17 +23,18 @@ string send_fifo = "status";
 Fifo recfifo(receive_fifo);
 Fifo sendfifo(send_fifo);
 
-enum state {noPlayer, onePlayer, twoPlayer, player1Turn, player2Turn, takeTurn, player1Win, player2Win, tie, exitGame};
+enum state {noPlayer, onePlayer, twoPlayer, takeTurn, player1Win, player2Win, win, tie, exitGame};
 
 /* State machine functions */
 state noPlayerFn(Game& game, Player& player1);
 state onePlayerFn(Game& game, Player& player2);
 state twoPlayerFn(Game& game);
-state takeTurnFn(Game& game, Player& player);
+state takeTurnFn(Game& game, Player player);
 state player1TurnFn(Game& game);
 state player2TurnFn(Game& game);
 state player1WinFn(Game& game);
 state player2WinFn(Game& game);
+state winFn(Game& game, Player player);
 state tieFn(Game& game);
 
 /* Assisting functions */
@@ -46,6 +47,8 @@ int main() {
 	game.initializeBoard();
 	
 	Player player1, player2;
+	game.addPlayer(player1);
+	game.addPlayer(player2);
 	
 	state current = noPlayer;
 	
@@ -59,20 +62,20 @@ int main() {
 			case twoPlayer: current = twoPlayerFn(game);
 				break;
 			case takeTurn: 
-				if (game.getCurrentPlayer() == 1) {
+				if (game.getCurrentPlayerValue() == 0) {
 					current = takeTurnFn(game, player1);
-				} else if (game.getCurrentPlayer() == 2) {
+				} else if (game.getCurrentPlayerValue() == 1) {
 					current = takeTurnFn(game, player2);
-				} else {
-					cout << "Fatal error, I don't know whose turn it is." << endl;
-					return 0;
+				}
+				break;
+			case win: 
+				if (game.getCurrentPlayerValue() == 0) {
+					current = winFn(game, player2);
+				} else if (game.getCurrentPlayerValue() == 1) {
+					current = winFn(game, player1);
 				}
 				break;
 			case tie: current = tieFn(game);
-				break;
-			case player1Win: current = player1WinFn(game);
-				break;
-			case player2Win: current = player2WinFn(game);
 				break;
 			case exitGame: current = noPlayerFn(game, player1);
 		}
@@ -167,7 +170,7 @@ state twoPlayerFn(Game& game) {
 	return takeTurn;
 }
 
-state takeTurnFn(Game& game, Player& player) {
+state takeTurnFn(Game& game, Player player) {
 	
 	//receive the message
 	recfifo.openread();
@@ -180,9 +183,9 @@ state takeTurnFn(Game& game, Player& player) {
 	string getUpdate = "$update$10";
 	
 	//if the player's name isn't in the message or if the server is asking for an update, 
-	//we don't want to make their move, so just send them an unchanged boardstate and come back to this function again
-	
+	//we don't want to make their move, so just send them an unchanged boardstate and come back to this function again	
 	if (messageSig != player.getPlayerName() || message == getUpdate) {
+		cout << "Sending an unchanged boardstate." << endl;
 		sendfifo.openwrite();
 		sendfifo.send(boardState);
 		cout << "Sent: " << boardState << endl;
@@ -212,43 +215,21 @@ state takeTurnFn(Game& game, Player& player) {
 	//if there wasn't not a win, then there was a win
 	} else {
 		cout << "A win was detected!" << endl;
-		if (game.getCurrentPlayer() == 1) {
-			return player2Win;
-		} else if (game.getCurrentPlayer() == 2) {
-			return player1Win;
-		} else {
-			cout << "Except there was an error--I'm not sure which player won." << endl;
-			return exitGame;
-		}
+		return win;
 	}
 	
 	return takeTurn;
 }
 
-state player1WinFn(Game& game) {
-	string player1Name = game.getPlayer1Name();
-			
-	string winString = game.getBoardState() + ",WIN," + player1Name;
-
+state winFn(Game& game, Player player) {
+	string playerName = player.getPlayerName();
+	string winString = game.getBoardState() + ",WIN," + playerName;
+	
 	sendfifo.openwrite();
 	sendfifo.send(winString);
 	cout << "Sent: " << winString << endl;
 	sendfifo.fifoclose();
 
-	return exitGame;
-}
-
-state player2WinFn(Game& game) {
-	string player2Name = game.getPlayer2Name();
-	string winString = game.getBoardState() + ",WIN," + player2Name;
-
-	sendfifo.openwrite();
-	sendfifo.send(winString);
-	cout << "Sent: " << winString << endl;
-	sendfifo.fifoclose();
-
-	//cout << "Player 2 won!" << endl;
-	//cout << "Player 1 lost!" << endl;
 	return exitGame;
 }
 

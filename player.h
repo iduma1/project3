@@ -11,8 +11,11 @@ public:
     void setPlayerName(string message);    
     string getPlayerName();
     
+    void setSign(char symbol);
+    char getSign();
+    
 private:        
-   
+   char sign;
    string playerName;
     
 };

@@ -2,43 +2,22 @@
 #include <string>
 #include <vector>
 #include "game.h"
+#include "player.h"
 
 Game::Game() {		 
-    vector <char> tttBoard; 
+    vector <char> tttBoard;
+    vector <Player> players;
     coord = 0;
-    currentPlayer = 1;
-    player1Wins = 0;
-    player2Wins = 0;
+    currentPlayer = 0;
     numberOfMoves = 0;
 }
 
-string Game::intToString(int i) {
+void Game::addPlayer(Player p) {
+	players.push_back(p);
+}
 
-	string convertedString;
-
-	if (i == 0) {
-		convertedString = "0";
-	} else if (i == 1) {
-		convertedString = "1";	
-	} else if (i == 2) {
-		convertedString = "2";	
-	} else if (i == 3) {
-		convertedString = "3";	
-	} else if (i == 4) {
-		convertedString = "4";	
-	} else if (i == 5) {
-		convertedString = "5";	
-	} else if (i == 6) {
-		convertedString = "6";	
-	} else if (i == 7) {
-		convertedString = "7";	
-	} else if (i == 8) {
-		convertedString = "8";	
-	} else {
-		cout << "Error--string conversion failed." << endl;
-		return "butt";
-	}
-	return convertedString;
+void Game::clearPlayers() {
+	players.clear();
 }
 
 int Game::stringToInt(string message) {
@@ -86,7 +65,7 @@ bool Game::makeMove(string message) {
 
 	coord = stringToInt(message);
 	
-	if (currentPlayer == 1) {
+	if (currentPlayer == 0) {
 		if (tttBoard[coord] == 'X' || tttBoard[coord] == 'O') {
 			cout << "Error, that square is already occupied." << endl;
 		} else {
@@ -94,7 +73,7 @@ bool Game::makeMove(string message) {
 			nextTurn();
 			return true;
 		}
-	} else if (currentPlayer == 2) {
+	} else if (currentPlayer == 1) {
 		if (tttBoard[coord] == 'X' || tttBoard[coord] == 'O') {
 			cout << "Error, that square is already occupied." << endl;
 		} else {
@@ -106,6 +85,26 @@ bool Game::makeMove(string message) {
 		cout << "Error--currentPlayer: " << currentPlayer << "is not a valid value." << endl;
 		return false;
 	}
+}
+
+void Game::nextTurn() {
+	if (currentPlayer == 0) {
+		currentPlayer = 1;
+	} else if (currentPlayer == 1) {
+		currentPlayer = 0;
+	} else {
+		currentPlayer = 0;
+	}
+	numberOfMoves++;
+	//cout << "The value of currentPlayer is: " << currentPlayer << endl;
+}
+
+Player Game::getCurrentPlayer() {
+	return players[currentPlayer];
+}
+
+int Game::getCurrentPlayerValue() {
+	return currentPlayer;
 }
 
 bool Game::checkWin() {
@@ -144,10 +143,8 @@ bool Game::checkWin() {
 	}
 	
 	if (temp == true && currentPlayer == 1) {
-		player1Wins++;
 		return true;
 	} else if (temp == true && currentPlayer == 2) {
-		player2Wins++;
 		return true;
 	}
 }
@@ -158,18 +155,6 @@ bool Game::checkTie() {
 	} else {
 		return false;
 	}
-}
-
-void Game::nextTurn() {
-	if (currentPlayer == 1) {
-		currentPlayer = 2;
-	} else if (currentPlayer == 2) {
-		currentPlayer = 1;
-	} else {
-		currentPlayer = 1;
-	}
-	numberOfMoves++;
-	//cout << "The value of currentPlayer is: " << currentPlayer << endl;
 }
 
 void Game::displayBoard() {
@@ -200,26 +185,4 @@ string Game::getBoardState() {
 
 int Game::getNumberOfMoves() {
 	return numberOfMoves;
-}
-
-int Game::getCurrentPlayer() {
-	return currentPlayer;
-}
-
-void Game::setPlayer1Name(string message) {
-    player1Name = message;
-    return;
-}
-
-string Game::getPlayer1Name() {
-	return player1Name;
-}
-
-void Game::setPlayer2Name(string message) {
-    player2Name = message;
-    return;
-}
-
-string Game::getPlayer2Name() {
-	return player2Name;
 }
