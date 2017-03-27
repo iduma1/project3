@@ -28,7 +28,7 @@ if(navigator.appName == "Microsoft Internet Explorer") {
 window.onload = function getName() {//When the page loads, it requests a user's name
 		playerName = prompt("Enter Your Name", "player");//On entering the website, a player enters their name	
 		p1.innerText = playerName;//Displays the players name on the screen
-		callCGI(10);//Sends a call out to the CGI program that a player has connected
+		//callCGI(10);//Sends a call out to the CGI program that a player has connected
 }
 
 /*Uses the callCGI function to update the board every 3 seconds
@@ -99,7 +99,7 @@ function updateBoard(board) {
 	
 	turnDisplay(gameState);
 	
-	isGameOver(gameState);//Checks if the game met a terminal condition
+	isGameOver(gameState);//Checks if the game met a terminal condition	
 }
 
 /*This function displays the mark in each box based on the message received from CGI program
@@ -113,30 +113,37 @@ function displayMark(box,sign){//Checks the sign and determines which image to d
 	}else if (sign=="O")
 		document.getElementById(box).innerHTML='<img hspace="10px" src="http://i45.tinypic.com/23l1eo.jpg" height = 140px width = 140px />';
 	}
+
+/*This function updates the web page to display if it is the players turn or not*/
+function turnDisplay(boardState) {
+	document.getElementById("turnDisplay").style.visibility="visible";
 	
+	if (boardState[9] == playerName) {
+		turnStatus.innerText = "Your turn!";
+	} else {
+		turnStatus.innerText = boardState[10]+"'s Turn";
+	}
+	}
+
 function isGameOver(boardState) {//Function checks if the boardState has a terminal condition, such a s a winner or a tie
 
 	if (boardState.length > 11) {//This string
 	
 		document.getElementById("turnDisplay").style.visibility="hidden";//Hides the turn display div
 		
-		if(boardState[12]=="TIE") {//If the TIE string is in the array,
-			gameStatus.innerText = "Tie Game!";//Pushes text into gameStatus div
+		if(boardState[11]=="TIE") {//If the TIE string is in the array,
 			document.getElementById("gameOver").style.visibility="visible";//Reveals the div in the HTML
+			gameStatus.innerText = "Tie Game!";//Pushes text into gameStatus div
+			
 		}
 	
-		if(boardState[12]=="WIN") {//If the WIN string is in the array, 
-			gameStatus.innerText = boardState[13]+ " won!";//Pushes text into gameStatus div
+		if(boardState[11]=="WIN") {//If the WIN string is in the array, 
 			document.getElementById("gameOver").style.visibility="visible";//Reveals the div in HTML
+			gameStatus.innerText = boardState[12]+ " won!";//Pushes text into gameStatus div
+			
 		}
 	}else {return;}
 }
 
-function turnDisplay(boardState) {
-	if (boardState[9] == playerName) {
-		turnDisplay.innerText = "Your turn!"
-	} else {
-		turnDisplay.innerText = boardState[10]+"'s Turn"
-	}
-}
+
 
