@@ -9,13 +9,13 @@ table {
 	cellpadding: 0;
 	margin: 80px auto; 
 }
-/*
-#turn {
+
+#turnDisplay {
 	color: #ffffff;
 	text-align: center;
 	margin-top: -50px;
 }
-*/
+
 #playerNames {
 	color: #ffffff;
 	text-align: center;
