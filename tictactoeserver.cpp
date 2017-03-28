@@ -81,9 +81,9 @@ int main() {
 				break;
 			case exitGame: 
 				if (game.getCurrentPlayerValue() == 0) {
-					current = exitGameFn(game, player2);
-				} else if (game.getCurrentPlayerValue() == 1) {
 					current = exitGameFn(game, player1);
+				} else if (game.getCurrentPlayerValue() == 1) {
+					current = exitGameFn(game, player2);
 				}
 				break;
 		}
