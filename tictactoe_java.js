@@ -13,10 +13,12 @@
 //When the page loads, prompts user to enter name
 
 var XMLHttp;//Browser-specific var
-var cgiBusy = false;//Stores state of CGI (busy or not busy)
+var isCgiBusy = false;//Stores state of CGI (busy or not busy)
 var playerName; //Stores the player's name
-var o
+var opponentName;//Name of the person the player is opposing
 var boardState="Z,Z,Z,Z,Z,Z,Z,Z,Z";//Stores the current state of the board
+var xImg = "<img hspace='30px' src='https://s3.amazonaws.com/piktochartv2-dev/v2/uploads/8a5899ab-d13e-4cc7-8a12-36279b4e20c1/67fe65d4bb6da9c4303037822efc43a48e7cba44_original.png' height = 140px width = 100px/>";
+var oImg = "<img hspace='10px' src='http://i45.tinypic.com/23l1eo.jpg' height = 140px width = 140px />";
 
 /*XMLHttp object definition based on the web browser*/
 if(navigator.appName == "Microsoft Internet Explorer") {
@@ -31,22 +33,38 @@ window.onload = function getName() {//When the page loads, it requests a user's 
 		//callCGI(10);//Sends a call out to the CGI program that a player has connected
 }
 
+function themeSelect(themeChoice) {
+	if (themeChoice == "joeBarry") {
+		xImg = "<img hspace='30px' src='https://s3.amazonaws.com/piktochartv2-dev/v2/uploads/8a5899ab-d13e-4cc7-8a12-36279b4e20c1/67fe65d4bb6da9c4303037822efc43a48e7cba44_original.png' height = 140px width = 100px/>";
+		oImg = "<img hspace='10px' src='http://i45.tinypic.com/23l1eo.jpg' height = 140px width = 140px/>";
+	} else if (themeChoice == "puppiesKittens") {
+		xImg = "<img hspace='10px' vspace='10px' src='http://static.wixstatic.com/media/e51cae_14d203aa93df4438a60cbdc2edb40468.png_srz_449_423_85_22_0.50_1.20_0.00_png_srz' height = 130px width = 138px/>";
+		oImg = "<img hspace='10px' src='http://www.downesvets.co.uk/wp-content/uploads/2015/07/kitten-package1.png' height = 140px width = 140px />";
+	} else {
+		xImg = "<img hspace='10px' src='https://s-media-cache-ak0.pinimg.com/originals/92/c8/5b/92c85b38a1453f8657c2d6cc137d17a6.png' height = 140px width = 140px />";
+		oImg = "<img hspace='10px' src='https://ih0.redbubble.net/image.283066282.2098/sticker,375x360.u1.png' height = 140px width = 140px />";
+	}
+
+}
+
+
 /*Uses the callCGI function to update the board every 3 seconds
 setInterval(function(){ 
 	callCGI(10);//pos=10 means update the board
 },3000);
 */
 
+
 //Function that will send and receive messages from the cgi program. When pos=10, program requests board update
 function callCGI(pos) {
 	
-	if (cgiBusy == true) {//If the CGI is busy, this function quits
+	if (isCgiBusy == true) {//If the CGI is busy, this function quits
 	
 		return;
 		
 	}else {//If CGI is not busy, 
 	
-		cgiBusy = true;//Change CGI state to busy
+		isCgiBusy = true;//Change CGI state to busy
 		
 		if(pos==10) {//When pos is 10, we simply are updating the board. We don't want a player sending a move.
 			XMLHttp.open("GET", "/cgi-bin/solorioc_tictactoe_ajax.cgi?"
@@ -73,7 +91,7 @@ function callCGI(pos) {
 	
 	XMLHttp.send(null);
 	
-	cgiBusy = false;//Reset the CGI state to not busy
+	isCgiBusy = false;//Reset the CGI state to not busy
 					 
 }
 
@@ -97,6 +115,13 @@ function updateBoard(board) {
 	displayMark('LM',gameState[7]);//box 7
 	displayMark('LR',gameState[8]);//box 8
 	
+	if(opponentName == null) {
+		if (gameState[9] != playerName) {
+				opponentName = gameState[9];
+				p2.innerText = opponentName;
+		}
+
+	}
 	turnDisplay(gameState);
 	
 	isGameOver(gameState);//Checks if the game met a terminal condition	
@@ -109,9 +134,9 @@ function updateBoard(board) {
 
 function displayMark(box,sign){//Checks the sign and determines which image to display
 	if(sign=="X") {	
-		document.getElementById(box).innerHTML='<img hspace="30px" src="https://s3.amazonaws.com/piktochartv2-dev/v2/uploads/8a5899ab-d13e-4cc7-8a12-36279b4e20c1/67fe65d4bb6da9c4303037822efc43a48e7cba44_original.png" height = 140px width = 100px/>';
+		document.getElementById(box).innerHTML= xImg;
 	}else if (sign=="O")
-		document.getElementById(box).innerHTML='<img hspace="10px" src="http://i45.tinypic.com/23l1eo.jpg" height = 140px width = 140px />';
+		document.getElementById(box).innerHTML= oImg;
 	}
 
 /*This function updates the web page to display if it is the players turn or not*/
@@ -120,30 +145,28 @@ function turnDisplay(boardState) {
 	
 	if (boardState[9] == playerName) {
 		turnStatus.innerText = "Your turn!";
+	} else if (boardState[9] == "onePlayer") {
+		turnStatus.innerText = "Waiting for a second player to connect";
 	} else {
-		turnStatus.innerText = boardState[10]+"'s Turn";
+		turnStatus.innerText = boardState[9] + "'s Turn";
 	}
-	}
+}
 
-function isGameOver(boardState) {//Function checks if the boardState has a terminal condition, such a s a winner or a tie
+/*This function determines if the game has met a terminal condition. */
+function isGameOver(boardState) {//Function checks if the boardState has a terminal condition, such as a winner or a tie
 
-	if (boardState.length > 11) {//This string
+	if (boardState.length > 10) {//This string
 	
 		document.getElementById("turnDisplay").style.visibility="hidden";//Hides the turn display div
 		
-		if(boardState[11]=="TIE") {//If the TIE string is in the array,
+		if(boardState[10]=="TIE") {//If the TIE string is in the array,
 			document.getElementById("gameOver").style.visibility="visible";//Reveals the div in the HTML
 			gameStatus.innerText = "Tie Game!";//Pushes text into gameStatus div
-			
 		}
 	
-		if(boardState[11]=="WIN") {//If the WIN string is in the array, 
+		if(boardState[10]=="WIN") {//If the WIN string is in the array, 
 			document.getElementById("gameOver").style.visibility="visible";//Reveals the div in HTML
-			gameStatus.innerText = boardState[12]+ " won!";//Pushes text into gameStatus div
-			
+			gameStatus.innerText = boardState[11]+ " won!";//Pushes text into gameStatus div	
 		}
 	}else {return;}
 }
-
-
-

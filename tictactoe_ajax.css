@@ -1,6 +1,7 @@
 body {
 	background: radial-gradient(#7E57C2,#512DA8);
 	font-family: Roboto, Arial;
+	color: #ffffff;
 }
 
 table {
@@ -109,3 +110,6 @@ table {
 	visibility: hidden;
 }
 
+#themeSelect {
+	margin-top: -100px;
+}
