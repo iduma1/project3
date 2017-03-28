@@ -132,29 +132,23 @@ state noPlayerFn(Game& game, Player& player1) {
 	recfifo.fifoclose();					//close rec fifo
 	cout << "Received: " << message << endl;
 	
-	if (parseCommand(message) == "restartServer") {
-		return noPlayer;
-	}
+	string player1Name = parseName(message);	
+	player1.setPlayerName(player1Name);		//store player 1 name
+	sendfifo.openwrite();					//open send fifo
 	
-	//if the game's asking for an update, just send a null boardstate
-	//and come back to this function
-	string boardState = game.getBoardState();
 	if (parseCommand(message) != "playerRegister") {
-		sendfifo.openwrite();
-		sendfifo.send(boardState);
+		string boardState = game.getBoardState();
+		sendfifo.send(boardState);				//send the boardstate
+		sendfifo.fifoclose();					//close send fifo
 		cout << "Sent: " << boardState << endl;
-		sendfifo.fifoclose();
 		return noPlayer;
 	} else {
-		string player1Name = parseName(message);	
-		player1.setPlayerName(player1Name);		//store player 1 name
-		boardState = game.getBoardState() + ",onePlayer";
-		sendfifo.openwrite();					//open send fifo
+		string boardState = game.getBoardState() + ",onePlayer";
 		sendfifo.send(boardState);				//send the boardstate
 		sendfifo.fifoclose();					//close send fifo
 		cout << "Sent: " << boardState << endl;
 		return onePlayer;
-	}	
+	}
 }
 
 state onePlayerFn(Game& game, Player player1, Player& player2) {
@@ -164,22 +158,23 @@ state onePlayerFn(Game& game, Player player1, Player& player2) {
 	recfifo.fifoclose();					//close rec fifo	
 	cout << "Received: " << message << endl;
 	
-	if (parseCommand(message) == "restartServer") {
-		return noPlayer;
-	}
+	string player2Name = parseName(message);	
+	player2.setPlayerName(player2Name);		//store player 1 name
+	sendfifo.openwrite();					//open send fifo
 	
-	string boardState = game.getBoardState();
-	if (parseCommand(message) != "playerRegister") {
-		sendfifo.openwrite();
-		sendfifo.send(boardState);
+	string boardState = game.getBoardState();	
+	if (parseCommand(message) == "restartServer") {
+		sendfifo.send(boardState);				//send the boardstate
+		sendfifo.fifoclose();					//close send fifo
 		cout << "Sent: " << boardState << endl;
-		sendfifo.fifoclose();
+		return noPlayer;	
+	} else if (parseCommand(message) != "playerRegister") {
+		sendfifo.send(boardState);				//send the boardstate
+		sendfifo.fifoclose();					//close send fifo
+		cout << "Sent: " << boardState << endl;
 		return onePlayer;
 	} else {
-		string player2Name = parseName(message);	
-		player2.setPlayerName(player2Name);		//store player 1 name
-		boardState = game.getBoardState() + "," + player1.getPlayerName();
-		sendfifo.openwrite();					//open send fifo
+	 	boardState = game.getBoardState() + "," + player1.getPlayerName();	
 		sendfifo.send(boardState);				//send the boardstate
 		sendfifo.fifoclose();					//close send fifo
 		cout << "Sent: " << boardState << endl;
@@ -203,49 +198,43 @@ state takeTurnFn(Game& game, Player inactivePlayer) {
 	
 	string boardState = game.getBoardState(); //get the boardstate
 	string name = parseName(message); //parse the players' name from the message
-	string command = parseCommand(message);
+	string command = parseCommand(message); //parse command
+	string coord = parseCoord(message); //parse coordinate
 	
-	if (command == "restartServer") {
-		return noPlayer;
-	}
-	
-	//if the player's name isn't in the message or if the server is asking for an update, 
-	//we don't want to make their move, so just send them an unchanged boardstate and come back to this function again	
-	if (name == inactivePlayer.getPlayerName() || command != "makeMove") {
-		cout << "Sending an unchanged boardstate." << endl;
+	if (command == "makeMove") {
+		game.makeMove(coord);
+		boardState = game.getBoardState() + ',' + inactivePlayer.getPlayerName(); //get the boardstate afterwards, prep the message to send to server
+		game.displayBoard();
+		//if there is no win
+		if (game.checkWin() != true) {
+			//if there is no tie
+			if (game.checkTie() != true) {
+				sendfifo.openwrite();
+				sendfifo.send(boardState);
+				cout << "Sent: " << boardState << endl;
+				sendfifo.fifoclose();
+				return takeTurn;	
+			} else {
+				cout << "A tie was detected!" << endl;
+				return tie;
+			}
+		} else {
+			cout << "A win was detected!" << endl;
+			return win;
+		}
+		return takeTurn;
+	//if the command wasn't makemove
+	} else {
 		sendfifo.openwrite();
 		sendfifo.send(boardState);
 		cout << "Sent: " << boardState << endl;
 		sendfifo.fifoclose();
+	}
+	if (command == "restartServer") {
+		return noPlayer;
+	} else {
 		return takeTurn;
 	}
-	
-	//otherwise, make their move
-	string coord = parseCoord(message); //parse the coordinates from the message
-	game.makeMove(coord); //make the move using the received coordinate
-	boardState = game.getBoardState() + ',' + inactivePlayer.getPlayerName(); //get the boardstate afterwards, prep the message to send to server
-	game.displayBoard(); //show the boardstate
-	
-	//check for a tie or a win, otherwise send back the boardstate
-	if (game.checkWin() != true) {
-		if (game.checkTie() != true) {
-			sendfifo.openwrite();
-			sendfifo.send(boardState);
-			cout << "Sent: " << boardState << endl;
-			sendfifo.fifoclose();
-			return takeTurn;
-		//if there wasn't a win, but there wasn't not a tie, then there was a tie (lol)
-		} else {
-			cout << "A tie was detected!" << endl;
-			return tie;
-		}
-	//if there wasn't not a win, then there was a win
-	} else {
-		cout << "A win was detected!" << endl;
-		return win;
-	}
-	
-	return takeTurn;
 }
 
 state winFn(Game& game, Player player) {
@@ -289,5 +278,4 @@ state exitGameFn(Game& game, Player player) {
 	} else {
 		return exitGame;
 	}
-	
 }

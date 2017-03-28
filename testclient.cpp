@@ -25,7 +25,8 @@ string makeMessage(string playerName);
 
 int main() {
 
-	string playerName, message, serverStatus, position;
+	string playerName, message, serverStatus, position, convertedCommand;
+	int command;
 	string winString = "$WIN";
 	string loseString = "$LOSE";
 	string tieString = "$TIE";
@@ -33,13 +34,27 @@ int main() {
 	cout << "Opening send FIFO" << endl;
 	sendfifo.openwrite();
 	cout << "Opened send FIFO" << endl;
-
+	
+	cout << "Enter your command--1 = update, 2 = makeMove, 3 = restartServer, 4 = playerRegister:" << endl;
+	cin >> command;
+	if (command == 1) {
+		convertedCommand = "reqUpdate";
+	} else if (command == 2) {
+		convertedCommand = "makeMove";
+	} else if (command == 3) {
+		convertedCommand = "restartServer";
+	} else if (command == 4) {
+		convertedCommand = "playerRegister";
+	} else {
+		cout << "Invalid input." << endl;
+		return 0;
+	}
 	cout << "Enter your name:" << endl;
 	cin >> playerName;
 	cout << "Enter a position:" << endl;
 	cin >> position;
 	
-	message = "$" + playerName + "$" + position;
+	message = "$" + convertedCommand + "$" + playerName + "$" + position;
 	
 	sendfifo.send(message);
 	cout << "Sent: " << message << endl;
