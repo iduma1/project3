@@ -36,16 +36,23 @@ int main() {
 
 	Cgicc cgi;// Ajax object
 	char *cstr;
+	string playerMove;
 
 	// Create AJAX objects to recieve information from web page.
-	form_iterator pname = cgi.getElement("player");//Gets the player who made move
+	form_iterator command = cgi.getElement("command");//Gets the command
+	form_iterator playerName = cgi.getElement("player");//Gets the player who made move
 	form_iterator pos = cgi.getElement("pos");//Gets the move the player made
+
 
 	// create the FIFOs for communication
 	Fifo recfifo(receive_fifo);
 	Fifo sendfifo(send_fifo);
-
-	string playerMove = "$"+**pname+"$"+**pos;//Creates a string with player name and the position $player$position
+	
+	if(**command != "sendMove") {
+		playerMove = "$"+**command+"$"+**playerName;
+	} else {
+		playerMove = "$"+**command+"$"+**playerName+"$"+**pos;//Creates a string with player name and the position $player$position
+	}
 	
 	/*Send message to server*/
 	sendfifo.openwrite();

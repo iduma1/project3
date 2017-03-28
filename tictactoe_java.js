@@ -1,9 +1,5 @@
 /*NOTES: 
- *TEST
- *Each javascript is its own instance
- *Figure out a turn counter. Could use some sort of global var
- *CGI program will have to tell each instance of page who is connected
- *Tells you whose turn it is on screen?
+ *The javascript receives a board 
  *
  *
  *
@@ -16,7 +12,9 @@ var XMLHttp;//Browser-specific var
 var isCgiBusy = false;//Stores state of CGI (busy or not busy)
 var playerName; //Stores the player's name
 var opponentName;//Name of the person the player is opposing
-var boardState="Z,Z,Z,Z,Z,Z,Z,Z,Z";//Stores the current state of the board
+var boardState="Z,Z,Z,Z,Z,Z,Z,Z,Z";//Stores the current state of the board. Starts off empty. 
+
+/*Default theme for the baord.*/
 var xImg = "<img hspace='30px' src='https://s3.amazonaws.com/piktochartv2-dev/v2/uploads/8a5899ab-d13e-4cc7-8a12-36279b4e20c1/67fe65d4bb6da9c4303037822efc43a48e7cba44_original.png' height = 140px width = 100px/>";
 var oImg = "<img hspace='10px' src='http://i45.tinypic.com/23l1eo.jpg' height = 140px width = 140px />";
 
@@ -48,32 +46,44 @@ function themeSelect(themeChoice) {
 }
 
 
-/*Uses the callCGI function to update the board every 3 seconds
-setInterval(function(){ 
-	callCGI(10);//pos=10 means update the board
-},3000);
-*/
+
+//Uses the callCGI function to update the board every 3 seconds
+/*setInterval(function(){ 
+	callCGI(reqUpdate);//
+},3000);*/
 
 
-//Function that will send and receive messages from the cgi program. When pos=10, program requests board update
-function callCGI(pos) {
+
+/*Function that will send and receive messages from the cgi program. 
+ *The functions expects two parameters, a command and an position (position is optional)
+ *List of Commands: playerRegister: sends a message that a new player has signed on
+ 					reqUpdate: request update from server
+ *					sendMove: send a player's move to the server
+ *					restartServer: if a player disconnects, the server is restarted for another game
+ *The CGI program will send back a string with the game's state, including the signs in each position
+ *and contains information about if the game is a tie, or if there is a winner. 
+ */
+ 
+function callCGI(command, pos) {
 	
-	if (isCgiBusy == true) {//If the CGI is busy, this function quits
+	pos = pos || 10;//If pos is not passed, defaults to 10 - an undefined place on the board
+	 
+	if (isCgiBusy == true) {
+		return; //Quits if CGI is busy (prevents deadlocks)
+	}else {
 	
-		return;
+		isCgiBusy = true;//Change CGI state to busy if not busy
 		
-	}else {//If CGI is not busy, 
-	
-		isCgiBusy = true;//Change CGI state to busy
-		
-		if(pos==10) {//When pos is 10, we simply are updating the board. We don't want a player sending a move.
+		/*If the command was reqUpdate or restartServer, there is no position to send*/
+		if(command != "sendMove") {
 			XMLHttp.open("GET", "/cgi-bin/solorioc_tictactoe_ajax.cgi?"
-						 +"&player=" + "update"
-						 +"&pos=" + pos
+						 +"&command=" + command
+						 +"&player=" + player
 						 ,true);
-		}else {//When the user clicks a box on the board
+		}else {//If the command was sendMove, sends player's name and position clicked
 		
 		XMLHttp.open("GET", "/cgi-bin/solorioc_tictactoe_ajax.cgi?"
+						 +"&command=" + command
 						 +"&player=" + playerName
 						 +"&pos=" + pos
 						 ,true);
@@ -116,7 +126,7 @@ function updateBoard(board) {
 	displayMark('LR',gameState[8]);//box 8
 	
 	if(opponentName == null) {
-		if (gameState[9] != playerName) {
+		if (gameState[9] != playerName && gameState[9] != "onePlayer") {
 				opponentName = gameState[9];
 				p2.innerText = opponentName;
 		}
@@ -146,7 +156,7 @@ function turnDisplay(boardState) {
 	if (boardState[9] == playerName) {
 		turnStatus.innerText = "Your turn!";
 	} else if (boardState[9] == "onePlayer") {
-		turnStatus.innerText = "Waiting for a second player to connect";
+		turnStatus.innerText = "Waiting for a second player to connect...";
 	} else {
 		turnStatus.innerText = boardState[9] + "'s Turn";
 	}
