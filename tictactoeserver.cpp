@@ -39,6 +39,7 @@ state tieFn(Game& game);
 state exitGameFn(Game& game, Player player);
 
 /* Assisting functions */
+string parseCommand(string message);
 string parseName(string message);
 string parseCoord(string message);
 
@@ -90,21 +91,33 @@ int main() {
 	return 0;
 }
 
-string parseName(string message) {
-	
+string parseCommand(string message) {
+
 	//parse the message to find the player's name
-	int start = message.find_first_of("$");
-	int end = message.find_last_of("$");
-	string name = message.substr(start + 1, end - 1);
+	int first = message.find_first_of("$");
+	int second = message.find("$", first + 1);
+	string command = message.substr(first + 1, second - 1);
 	
+	return command;
+}
+
+string parseName(string message) {
+
+	//parse the message to find the player's name
+	int first = message.find_first_of("$");
+	int second = message.find("$", first + 1);
+	int third = message.find("$", second + 1);
+	string name = message.erase(third);
+	name = name.substr(second + 1);
+		
 	return name;
 }
 
 string parseCoord(string message) {
 
 	//parse the message to find the player's coordinate
-	int second = message.find_last_of("$");
-	string coord = message.substr(second + 1);
+	int third = message.find_last_of("$");
+	string coord = message.substr(third + 1);
 
 	return coord;
 }
@@ -120,6 +133,10 @@ state noPlayerFn(Game& game, Player& player1) {
 	recfifo.fifoclose();					//close rec fifo
 	
 	cout << "Received: " << message << endl;
+	
+	cout << "Parsing... command is: " << parseCommand(message) << endl;
+	cout << "Name is: " << parseName(message) << endl;
+	cout << "Coord is: " << parseCoord(message) << endl;
 	
 	string player1Name = parseName(message);
 	string boardState = game.getBoardState() + ",onePlayer";
