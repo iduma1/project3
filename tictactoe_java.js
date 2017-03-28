@@ -15,7 +15,7 @@ var opponentName;//Name of the person the player is opposing
 var boardState="Z,Z,Z,Z,Z,Z,Z,Z,Z";//Stores the current state of the board. Starts off empty. 
 var isOpponentNameDeclared = false;
 
-/*Default theme for the baord.*/
+/*Default theme for the board.*/
 var xImg = "<img hspace='30px' src='https://s3.amazonaws.com/piktochartv2-dev/v2/uploads/8a5899ab-d13e-4cc7-8a12-36279b4e20c1/67fe65d4bb6da9c4303037822efc43a48e7cba44_original.png' height = 140px width = 100px/>";
 var oImg = "<img hspace='10px' src='http://i45.tinypic.com/23l1eo.jpg' height = 140px width = 140px />";
 
@@ -29,10 +29,10 @@ if(navigator.appName == "Microsoft Internet Explorer") {
 window.onload = function getName() {//When the page loads, it requests a user's name
 		playerName = prompt("Enter Your Name", "player");//On entering the website, a player enters their name	
 		p1.innerText = playerName;//Displays the players name on the screen
-		//callCGI(10);//Sends a call out to the CGI program that a player has connected
+		CallCGI("playerRegister");//Sends a call out to the CGI program that a player has connected
 }
 
-function themeSelect(themeChoice) {
+function ThemeSelect(themeChoice) {
 	if (themeChoice == "Kermit") {
 		xImg = "<img hspace='10px' src='https://s-media-cache-ak0.pinimg.com/originals/92/c8/5b/92c85b38a1453f8657c2d6cc137d17a6.png' height = 140px width = 140px />";
 		oImg = "<img hspace='10px' src='https://ih0.redbubble.net/image.283066282.2098/sticker,375x360.u1.png' height = 140px width = 140px />";
@@ -47,10 +47,9 @@ function themeSelect(themeChoice) {
 }
 
 
-
-//Uses the callCGI function to update the board every 3 seconds
+//Uses the CallCGI function to update the board every 3 seconds
 /*setInterval(function(){ 
-	callCGI(reqUpdate);//
+	CallCGI("reqUpdate");//
 },3000);*/
 
 
@@ -59,13 +58,14 @@ function themeSelect(themeChoice) {
  *The functions expects two parameters, a command and an position (position is optional)
  *List of Commands: playerRegister: sends a message that a new player has signed on
  					reqUpdate: request update from server
- *					sendMove: send a player's move to the server
+ *					makeMove: send a player's move to the server
  *					restartServer: if a player disconnects, the server is restarted for another game
  *The CGI program will send back a string with the game's state, including the signs in each position
  *and contains information about if the game is a tie, or if there is a winner. 
  */
  
-function callCGI(command, pos) {
+ /*
+function CallCGI(command, pos) {
 	
 	pos = pos || 10;//If pos is not passed, defaults to 10 - an undefined place on the board
 	 
@@ -75,13 +75,13 @@ function callCGI(command, pos) {
 	
 		isCgiBusy = true;//Change CGI state to busy if not busy
 		
-		/*If the command was reqUpdate or restartServer, there is no position to send*/
-		if(command != "sendMove") {
+		//If the command was reqUpdate or restartServer, there is no position to send
+		if(command != "makeMove") {
 			XMLHttp.open("GET", "/cgi-bin/solorioc_tictactoe_ajax.cgi?"
 						 +"&command=" + command
 						 +"&player=" + playerName
 						 ,true);
-		}else {//If the command was sendMove, sends player's name and position clicked
+		}else {//If the command was makeMove, sends player's name and position clicked
 		
 		XMLHttp.open("GET", "/cgi-bin/solorioc_tictactoe_ajax.cgi?"
 						 +"&command=" + command
@@ -94,7 +94,7 @@ function callCGI(command, pos) {
 		
 			if (XMLHttp.readyState === 4) {//On the 4th state, 
 				boardState = XMLHttp.responseText;//The string that the tictactoe_ajax.cpp c-outs is stored
-				updateBoard(boardState);//Use the displayBoard function to update the board on player's screen
+				UpdateBoard(boardState);//Use the displayBoard function to update the board on player's screen
 			}
 		}
 	
@@ -105,40 +105,40 @@ function callCGI(command, pos) {
 	isCgiBusy = false;//Reset the CGI state to not busy
 					 
 }
+*/
 
 /*This function upates the images displayed on the board*/
-function updateBoard(board) {
+
+function UpdateBoard(board) {
 	/*Board will be a string like ""O,X,Z,Z,Z,Z,O,X,O" in the case that the game is not over
 	 *Board will be a string like "O,X,Z,Z,Z,Z,O,X,O,WIN,JOHN" in the case that there is a winner
 	 *Board will be a string like "O,X,Z,Z,Z,Z,O,X,O,TIE"in the case that there is a tie
 	 */
-	
 
 	var gameState = board.split(",");//Turns the string into an array separated by the commas
 	
 	/*Displays the apropriate mark in each box as given by the boxSign array*/
-	displayMark('UL',gameState[0]);//box 0
-	displayMark('UM',gameState[1]);//box 1
-	displayMark('UR',gameState[2]);//box 2
-	displayMark('ML',gameState[3]);//box 3
-	displayMark('MM',gameState[4]);//box 4
-	displayMark('MR',gameState[5]);//box 5
-	displayMark('LL',gameState[6]);//box 6
-	displayMark('LM',gameState[7]);//box 7
-	displayMark('LR',gameState[8]);//box 8
-	
+	DisplayMark('UL',gameState[0]);//box 0
+	DisplayMark('UM',gameState[1]);//box 1
+	DisplayMark('UR',gameState[2]);//box 2
+	DisplayMark('ML',gameState[3]);//box 3
+	DisplayMark('MM',gameState[4]);//box 4
+	DisplayMark('MR',gameState[5]);//box 5
+	DisplayMark('LL',gameState[6]);//box 6
+	DisplayMark('LM',gameState[7]);//box 7
+	DisplayMark('LR',gameState[8]);//box 8
 	
 	if(opponentName == null || isOpponentNameDeclared != true) {
 		if (gameState[9] != playerName && gameState[9] != "onePlayer") {
 				opponentName = gameState[9];
 				p2.innerText = opponentName;
-				var isOpponentNameDeclared = true;
+				isOpponentNameDeclared = true;
 		}
-
 	}
-	turnDisplay(gameState);
 	
-	isGameOver(gameState);//Checks if the game met a terminal condition	
+	DisplayTurn(gameState);
+	
+	DetectGameOver(gameState);//Checks if the game met a terminal condition	
 }
 
 /*This function displays the mark in each box based on the message received from CGI program
@@ -146,7 +146,7 @@ function updateBoard(board) {
  *if the sign is anything other than X or O, no image is displayed
 */
 
-function displayMark(box,sign){//Checks the sign and determines which image to display
+function DisplayMark(box,sign){//Checks the sign and determines which image to display
 	if(sign=="X") {	
 		document.getElementById(box).innerHTML= xImg;
 	}else if (sign=="O")
@@ -154,7 +154,7 @@ function displayMark(box,sign){//Checks the sign and determines which image to d
 	}
 
 /*This function updates the web page to display if it is the players turn or not*/
-function turnDisplay(boardState) {
+function DisplayTurn(boardState) {
 	document.getElementById("turnDisplay").style.visibility="visible";
 	
 	if (boardState[9] == playerName) {
@@ -167,7 +167,7 @@ function turnDisplay(boardState) {
 }
 
 /*This function determines if the game has met a terminal condition. */
-function isGameOver(boardState) {//Function checks if the boardState has a terminal condition, such as a winner or a tie
+function DetectGameOver(boardState) {//Function checks if the boardState has a terminal condition, such as a winner or a tie
 
 	if (boardState.length > 10) {//This string
 	
@@ -183,4 +183,15 @@ function isGameOver(boardState) {//Function checks if the boardState has a termi
 			gameStatus.innerText = boardState[11]+ " won!";//Pushes text into gameStatus div	
 		}
 	}else {return;}
+}
+
+
+function PlayAgain() {
+	CallCGI("restartSever");
+	window.location.reload;
+}
+
+window.onbeforeunload = function(){
+	CallCGI("restartServer");
+	return 'Are you sure you want to leave?';
 }
