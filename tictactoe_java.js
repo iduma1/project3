@@ -48,9 +48,10 @@ function ThemeSelect(themeChoice) {
 
 
 //Uses the CallCGI function to update the board every 3 seconds
-/*setInterval(function(){ 
+
+setInterval(function(){ 
 	CallCGI("reqUpdate");//
-},3000);*/
+},3000);
 
 
 
@@ -64,7 +65,7 @@ function ThemeSelect(themeChoice) {
  *and contains information about if the game is a tie, or if there is a winner. 
  */
  
- /*
+ 
 function CallCGI(command, pos) {
 	
 	pos = pos || 10;//If pos is not passed, defaults to 10 - an undefined place on the board
@@ -80,6 +81,7 @@ function CallCGI(command, pos) {
 			XMLHttp.open("GET", "/cgi-bin/solorioc_tictactoe_ajax.cgi?"
 						 +"&command=" + command
 						 +"&player=" + playerName
+						 +"&pos=" + pos
 						 ,true);
 		}else {//If the command was makeMove, sends player's name and position clicked
 		
@@ -105,7 +107,7 @@ function CallCGI(command, pos) {
 	isCgiBusy = false;//Reset the CGI state to not busy
 					 
 }
-*/
+
 
 /*This function upates the images displayed on the board*/
 
@@ -157,6 +159,7 @@ function DisplayMark(box,sign){//Checks the sign and determines which image to d
 function DisplayTurn(boardState) {
 	document.getElementById("turnDisplay").style.visibility="visible";
 	
+	if (boardState[9] == null) {return;}
 	if (boardState[9] == playerName) {
 		turnStatus.innerText = "Your turn!";
 	} else if (boardState[9] == "onePlayer") {
@@ -187,11 +190,11 @@ function DetectGameOver(boardState) {//Function checks if the boardState has a t
 
 
 function PlayAgain() {
-	CallCGI("restartSever");
-	window.location.reload;
+	//CallCGI("restartSever");
+	window.location.reload();
 }
 
 window.onbeforeunload = function(){
-	CallCGI("restartServer");
+	//CallCGI("restartServer");
 	return 'Are you sure you want to leave?';
 }

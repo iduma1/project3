@@ -28,6 +28,12 @@ table {
 #p2 {display: inline;}
 #vs{display: inline;}
 
+#board {
+	width: 500px;
+	margin: -50 auto;
+	
+}
+
 #UL {
 	height: 150px;
 	width: 150px;
@@ -111,5 +117,8 @@ table {
 }
 
 #themeSelect {
-	margin-top: -100px;
+	float: left;
+	margin-top: -10px;
+	margin-bottom: auto;
+	
 }
