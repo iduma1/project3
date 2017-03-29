@@ -29,7 +29,7 @@ enum state {noPlayer, onePlayer, twoPlayer, takeTurn, win, tie, exitGame};
 state noPlayerFn(Game& game, Player& player1);
 state onePlayerFn(Game& game, Player player1, Player& player2);
 state twoPlayerFn(Game& game);
-state takeTurnFn(Game& game, Player inactivePlayer);
+state takeTurnFn(Game& game, Player inactivePlayer, Player activePlayer);
 state player1TurnFn(Game& game);
 state player2TurnFn(Game& game);
 state player1WinFn(Game& game);
@@ -65,16 +65,16 @@ int main() {
 				break;
 			case takeTurn: 
 				if (game.getCurrentPlayerValue() == 0) {
-					current = takeTurnFn(game, player2);
+					current = takeTurnFn(game, player2, player1);
 				} else if (game.getCurrentPlayerValue() == 1) {
-					current = takeTurnFn(game, player1);
+					current = takeTurnFn(game, player1, player2);
 				}
 				break;
 			case win: 
 				if (game.getCurrentPlayerValue() == 0) {
-					current = winFn(game, player2);
-				} else if (game.getCurrentPlayerValue() == 1) {
 					current = winFn(game, player1);
+				} else if (game.getCurrentPlayerValue() == 1) {
+					current = winFn(game, player2);
 				}
 				break;
 			case tie: current = tieFn(game);
@@ -188,7 +188,7 @@ state twoPlayerFn(Game& game) {
 	return takeTurn;
 }
 
-state takeTurnFn(Game& game, Player inactivePlayer) {
+state takeTurnFn(Game& game, Player inactivePlayer, Player activePlayer) {
 	
 	//receive the message
 	recfifo.openread();
@@ -200,6 +200,8 @@ state takeTurnFn(Game& game, Player inactivePlayer) {
 	string name = parseName(message); //parse the players' name from the message
 	string command = parseCommand(message); //parse command
 	string coord = parseCoord(message); //parse coordinate
+	
+	cout << "The command I received was: " << command << endl;
 	
 	if (command == "makeMove") {
 		game.makeMove(coord);
@@ -225,6 +227,7 @@ state takeTurnFn(Game& game, Player inactivePlayer) {
 		return takeTurn;
 	//if the command wasn't makemove
 	} else {
+		boardState = game.getBoardState() + ',' + activePlayer.getPlayerName();
 		sendfifo.openwrite();
 		sendfifo.send(boardState);
 		cout << "Sent: " << boardState << endl;
@@ -265,6 +268,7 @@ state exitGameFn(Game& game, Player player) {
 	recfifo.openread();
 	string message = recfifo.recv();
 	recfifo.fifoclose();
+	cout << "Received: " << message << endl;
 	
 	string winString = game.getBoardState() + ",WIN," + player.getPlayerName();
 	sendfifo.openwrite();
