@@ -16,8 +16,8 @@ var boardState="Z,Z,Z,Z,Z,Z,Z,Z,Z";//Stores the current state of the board. Star
 var isOpponentNameDeclared = false;
 
 /*Default theme for the board.*/
-var xImg = "<img hspace='30px' src='https://s3.amazonaws.com/piktochartv2-dev/v2/uploads/8a5899ab-d13e-4cc7-8a12-36279b4e20c1/67fe65d4bb6da9c4303037822efc43a48e7cba44_original.png' height = 140px width = 100px/>";
-var oImg = "<img hspace='10px' src='http://i45.tinypic.com/23l1eo.jpg' height = 140px width = 140px />";
+var xImg = "<img hspace='30px' src='TictactoeImages/joe.png' height = 140px width = 100px/>";
+var oImg = "<img hspace='10px' src='TictactoeImages/barry.png' height = 140px width = 140px />";
 
 /*XMLHttp object definition based on the web browser*/
 if(navigator.appName == "Microsoft Internet Explorer") {
@@ -33,27 +33,24 @@ window.onload = function getName() {//When the page loads, it requests a user's 
 }
 
 function ThemeSelect(themeChoice) {
-	if (themeChoice == "Kermit") {
-		xImg = "<img hspace='10px' src='https://s-media-cache-ak0.pinimg.com/originals/92/c8/5b/92c85b38a1453f8657c2d6cc137d17a6.png' height = 140px width = 140px />";
-		oImg = "<img hspace='10px' src='https://ih0.redbubble.net/image.283066282.2098/sticker,375x360.u1.png' height = 140px width = 140px />";
+	if (themeChoice == "kermit") {
+		xImg = "<img hspace='10px' src='TictactoeImages/kermit.png' height = 140px width = 140px />";
+		oImg = "<img hspace='10px' src='TictactoeImages/evilkermit.png' height = 140px width = 140px />";
 	} else if (themeChoice == "puppiesKittens") {
-		xImg = "<img hspace='10px' vspace='10px' src='http://static.wixstatic.com/media/e51cae_14d203aa93df4438a60cbdc2edb40468.png_srz_449_423_85_22_0.50_1.20_0.00_png_srz' height = 130px width = 138px/>";
-		oImg = "<img hspace='10px' src='http://www.downesvets.co.uk/wp-content/uploads/2015/07/kitten-package1.png' height = 140px width = 140px />";
+		xImg = "<img src='TictactoeImages/puppy.png' hspace='10px' vspace='10px' height = 130px width = 138px/>";
+		oImg = "<img src='TictactoeImages/kitten.png' hspace='10px' height = 140px width = 140px />";
 	} else {
-		xImg = "<img hspace='30px' src='https://s3.amazonaws.com/piktochartv2-dev/v2/uploads/8a5899ab-d13e-4cc7-8a12-36279b4e20c1/67fe65d4bb6da9c4303037822efc43a48e7cba44_original.png' height = 140px width = 100px/>";
-		oImg = "<img hspace='10px' src='http://i45.tinypic.com/23l1eo.jpg' height = 140px width = 140px/>";	
+		xImg = "<img hspace='30px' src='TictactoeImages/joe.png' height = 140px width = 100px/>";
+		oImg = "<img hspace='10px' src='TictactoeImages/barry.png' height = 140px width = 140px />";
 	}
 
 }
 
-
 //Uses the CallCGI function to update the board every 3 seconds
 
-setInterval(function(){ 
+/*setInterval(function(){ 
 	CallCGI("reqUpdate");//
-},3000);
-
-
+},2000);*/
 
 /*Function that will send and receive messages from the cgi program. 
  *The functions expects two parameters, a command and an position (position is optional)
@@ -64,7 +61,6 @@ setInterval(function(){
  *The CGI program will send back a string with the game's state, including the signs in each position
  *and contains information about if the game is a tie, or if there is a winner. 
  */
- 
  
 function CallCGI(command, pos) {
 	
@@ -159,7 +155,7 @@ function DisplayMark(box,sign){//Checks the sign and determines which image to d
 function DisplayTurn(boardState) {
 	document.getElementById("turnDisplay").style.visibility="visible";
 	
-	if (boardState[9] == null) {return;}
+	//if (boardState[9] == null) {return;}
 	if (boardState[9] == playerName) {
 		turnStatus.innerText = "Your turn!";
 	} else if (boardState[9] == "onePlayer") {
