@@ -14,7 +14,7 @@ CFLAGS= -g
 RM= /bin/rm -f
 
 all: tictactoeserver testclient PutCGI PutHTML
-
+#all: PutHTML
 testclient.o: testclient.cpp fifo.h
 	$(CC) -c $(CFLAGS) testclient.cpp
 
