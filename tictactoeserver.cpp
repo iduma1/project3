@@ -242,7 +242,7 @@ state takeTurnFn(Game& game, Player inactivePlayer, Player activePlayer) {
 
 state winFn(Game& game, Player player) {
 	string playerName = player.getPlayerName();
-	string winString = game.getBoardState() + ",WIN," + playerName;
+	string winString = game.getBoardState() + playerName + ",WIN";
 	
 	sendfifo.openwrite();
 	sendfifo.send(winString);
@@ -270,7 +270,7 @@ state exitGameFn(Game& game, Player player) {
 	recfifo.fifoclose();
 	cout << "Received: " << message << endl;
 	
-	string winString = game.getBoardState() + ",WIN," + player.getPlayerName();
+	string winString = game.getBoardState() + player.getPlayerName() + ",WIN";
 	sendfifo.openwrite();
 	sendfifo.send(winString);
 	sendfifo.fifoclose();
