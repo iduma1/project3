@@ -270,7 +270,7 @@ state exitGameFn(Game& game, Player player) {
 	recfifo.fifoclose();
 	cout << "Received: " << message << endl;
 	
-	string winString = game.getBoardState() + player.getPlayerName() + ",WIN";
+	string winString = game.getBoardState() + "," + player.getPlayerName() + ",WIN";
 	sendfifo.openwrite();
 	sendfifo.send(winString);
 	sendfifo.fifoclose();
