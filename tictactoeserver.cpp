@@ -162,7 +162,7 @@ state onePlayerFn(Game& game, Player player1, Player& player2) {
 	player2.setPlayerName(player2Name);		//store player 1 name
 	sendfifo.openwrite();					//open send fifo
 	
-	string boardState = game.getBoardState();	
+	string boardState = game.getBoardState() + ",onePlayer";	
 	if (parseCommand(message) == "restartServer") {
 		sendfifo.send(boardState);				//send the boardstate
 		sendfifo.fifoclose();					//close send fifo
@@ -203,7 +203,7 @@ state takeTurnFn(Game& game, Player inactivePlayer, Player activePlayer) {
 	
 	cout << "The command I received was: " << command << endl;
 	
-	if (command == "makeMove") {
+	if (command == "makeMove" && name == activePlayer.getPlayerName()) {
 		game.makeMove(coord);
 		boardState = game.getBoardState() + ',' + inactivePlayer.getPlayerName(); //get the boardstate afterwards, prep the message to send to server
 		game.displayBoard();
