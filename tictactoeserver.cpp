@@ -242,7 +242,7 @@ state takeTurnFn(Game& game, Player inactivePlayer, Player activePlayer) {
 
 state winFn(Game& game, Player player) {
 	string playerName = player.getPlayerName();
-	string winString = game.getBoardState() + playerName + ",WIN";
+	string winString = game.getBoardState() + "," + playerName + ",WIN";
 	
 	sendfifo.openwrite();
 	sendfifo.send(winString);
@@ -253,7 +253,7 @@ state winFn(Game& game, Player player) {
 }
 
 state tieFn(Game& game) {
-	string tieString = game.getBoardState() + ",TIE";
+	string tieString = game.getBoardState() + ",dummyname,TIE";
 	
 	sendfifo.openwrite();
 	sendfifo.send(tieString);		
