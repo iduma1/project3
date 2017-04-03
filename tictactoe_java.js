@@ -48,9 +48,9 @@ function ThemeSelect(themeChoice) {
 
 //Uses the CallCGI function to update the board every 3 seconds
 
-/*setInterval(function(){ 
+setInterval(function(){ 
 	CallCGI("reqUpdate");//
-},2000);*/
+},2000);
 
 /*Function that will send and receive messages from the cgi program. 
  *The functions expects two parameters, a command and an position (position is optional)
@@ -64,7 +64,7 @@ function ThemeSelect(themeChoice) {
  
 function CallCGI(command, pos) {
 	
-	pos = pos || 10;//If pos is not passed, defaults to 10 - an undefined place on the board
+	pos = pos || 0;//If pos is not passed, defaults to 10 - an undefined place on the board
 	 
 	if (isCgiBusy == true) {
 		return; //Quits if CGI is busy (prevents deadlocks)
@@ -77,7 +77,7 @@ function CallCGI(command, pos) {
 			XMLHttp.open("GET", "/cgi-bin/solorioc_tictactoe_ajax.cgi?"
 						 +"&command=" + command
 						 +"&player=" + playerName
-						 +"&pos=" + pos
+						 //+"&pos=" + pos
 						 ,true);
 		}else {//If the command was makeMove, sends player's name and position clicked
 		
@@ -126,8 +126,8 @@ function UpdateBoard(board) {
 	DisplayMark('LM',gameState[7]);//box 7
 	DisplayMark('LR',gameState[8]);//box 8
 	
-	if(opponentName == null || isOpponentNameDeclared != true) {
-		if (gameState[9] != playerName && gameState[9] != "onePlayer") {
+	if(opponentName == null && isOpponentNameDeclared != true) {
+		if (gameState[9] != playerName && gameState[9] != "onePlayer" && gameState[9] != null) {
 				opponentName = gameState[9];
 				p2.innerText = opponentName;
 				isOpponentNameDeclared = true;
@@ -146,16 +146,17 @@ function UpdateBoard(board) {
 
 function DisplayMark(box,sign){//Checks the sign and determines which image to display
 	if(sign=="X") {	
-		document.getElementById(box).innerHTML= xImg;
+		document.getElementById(box).innerHTML = xImg;
 	}else if (sign=="O")
-		document.getElementById(box).innerHTML= oImg;
+		document.getElementById(box).innerHTML = oImg;
 	}
 
 /*This function updates the web page to display if it is the players turn or not*/
 function DisplayTurn(boardState) {
 	document.getElementById("turnDisplay").style.visibility="visible";
 	
-	//if (boardState[9] == null) {return;}
+	if (boardState[9] == null) {return;}
+	
 	if (boardState[9] == playerName) {
 		turnStatus.innerText = "Your turn!";
 	} else if (boardState[9] == "onePlayer") {
@@ -179,7 +180,7 @@ function DetectGameOver(boardState) {//Function checks if the boardState has a t
 	
 		if(boardState[10]=="WIN") {//If the WIN string is in the array, 
 			document.getElementById("gameOver").style.visibility="visible";//Reveals the div in HTML
-			gameStatus.innerText = boardState[11]+ " won!";//Pushes text into gameStatus div	
+			gameStatus.innerText = boardState[9]+ " won!";//Pushes text into gameStatus div	
 		}
 	}else {return;}
 }
