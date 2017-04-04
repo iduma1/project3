@@ -254,7 +254,20 @@ state tieFn(Game& game) {
 	cout << "Sent: " << tieString << endl;
 	sendfifo.fifoclose();
 	
-	return exitGame;
+	//wait to receive restartServer and go to no player
+	//if not restartServer, just return tieFn again
+	
+	recfifo.openread();
+	string message = recfifo.recv();
+	recfifo.fifoclose();
+	cout << "Received: " << message << endl;
+	
+	string command = parseCommand(message);
+	if (command == "restartServer") {
+		return noPlayer;
+	} else {
+		return tieFn;
+	}
 }
 
 state exitGameFn(Game& game, Player player) {
