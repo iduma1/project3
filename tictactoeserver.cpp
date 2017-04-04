@@ -72,18 +72,18 @@ int main() {
 				break;
 			case win: 
 				if (game.getCurrentPlayerValue() == 0) {
-					current = winFn(game, player1);
-				} else if (game.getCurrentPlayerValue() == 1) {
 					current = winFn(game, player2);
+				} else if (game.getCurrentPlayerValue() == 1) {
+					current = winFn(game, player1);
 				}
 				break;
 			case tie: current = tieFn(game);
 				break;
 			case exitGame: 
 				if (game.getCurrentPlayerValue() == 0) {
-					current = exitGameFn(game, player1);
-				} else if (game.getCurrentPlayerValue() == 1) {
 					current = exitGameFn(game, player2);
+				} else if (game.getCurrentPlayerValue() == 1) {
+					current = exitGameFn(game, player1);
 				}
 				break;
 		}
