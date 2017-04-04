@@ -131,9 +131,6 @@ state noPlayerFn(Game& game, Player& player1) {
 	string message = recfifo.recv();		//receive the message
 	recfifo.fifoclose();					//close rec fifo
 	cout << "Received: " << message << endl;
-	
-	string player1Name = parseName(message);	
-	player1.setPlayerName(player1Name);		//store player 1 name
 	sendfifo.openwrite();					//open send fifo
 	
 	if (parseCommand(message) != "playerRegister") {
@@ -143,6 +140,8 @@ state noPlayerFn(Game& game, Player& player1) {
 		cout << "Sent: " << boardState << endl;
 		return noPlayer;
 	} else {
+		string player1Name = parseName(message);	
+		player1.setPlayerName(player1Name);		//store player 1 name
 		string boardState = game.getBoardState() + ",onePlayer";
 		sendfifo.send(boardState);				//send the boardstate
 		sendfifo.fifoclose();					//close send fifo
@@ -157,13 +156,12 @@ state onePlayerFn(Game& game, Player player1, Player& player2) {
 	string message = recfifo.recv();		//receive the message
 	recfifo.fifoclose();					//close rec fifo	
 	cout << "Received: " << message << endl;
-	
-	string player2Name = parseName(message);	
-	player2.setPlayerName(player2Name);		//store player 1 name
 	sendfifo.openwrite();					//open send fifo
 	
 	string boardState = game.getBoardState() + "," + player1.getPlayerName();
 	if (parseCommand(message) == "playerRegister" || parseCommand(message) == "restartServer") {
+		string player2Name = parseName(message);	
+		player2.setPlayerName(player2Name);		//store player 1 name
 		sendfifo.send(boardState);				//send the boardstate
 		sendfifo.fifoclose();					//close send fifo
 		cout << "Sent: " << boardState << endl;
