@@ -264,9 +264,17 @@ state tieFn(Game& game) {
 	
 	string command = parseCommand(message);
 	if (command == "restartServer") {
+		sendfifo.openwrite();
+		sendfifo.send(tieString);
+		cout << "Sent: " << tieString << endl;
+		sendfifo.fifoclose();
 		return noPlayer;
 	} else {
-		return tieFn;
+		sendfifo.openwrite();
+		sendfifo.send(tieString);
+		cout << "Sent: " << tieString << endl;
+		sendfifo.fifoclose();
+		return tie;
 	}
 }
 
