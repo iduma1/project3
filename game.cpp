@@ -56,6 +56,10 @@ void Game::clearBoard() {
 	numberOfMoves = 0;
 }
 
+void Game::setNumberOfMoves(int i) {
+	numberOfMoves = i;
+}
+
 void Game::initializeBoard() {
 	for (int i = 0; i < 9; i++) {
 		tttBoard.push_back('Z');

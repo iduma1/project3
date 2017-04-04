@@ -21,6 +21,8 @@ public:
     void initializeBoard();
     
     void clearBoard();
+    
+    void setNumberOfMoves(int i);
 
     bool makeMove(string message);
 

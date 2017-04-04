@@ -125,6 +125,7 @@ string parseCoord(string message) {
 state noPlayerFn(Game& game, Player& player1) {
 
 	game.clearBoard(); 						//clear game board
+	game.setNumberOfMoves(0);
 
 	cout << "No players connected" << endl;	
 	recfifo.openread();						//Open rec fifo
