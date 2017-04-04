@@ -159,7 +159,7 @@ state onePlayerFn(Game& game, Player player1, Player& player2) {
 	sendfifo.openwrite();					//open send fifo
 	
 	string boardState = game.getBoardState() + "," + player1.getPlayerName();
-	if (parseCommand(message) == "playerRegister" || parseCommand(message) == "restartServer") {
+	if (parseCommand(message) == "playerRegister" /*|| parseCommand(message) == "restartServer"*/) {
 		string player2Name = parseName(message);	
 		player2.setPlayerName(player2Name);		//store player 1 name
 		sendfifo.send(boardState);				//send the boardstate
