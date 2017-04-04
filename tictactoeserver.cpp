@@ -266,7 +266,7 @@ state tieFn(Game& game) {
 	if (command == "restartServer") {
 		return noPlayer;
 	} else {
-		return tieFn;
+		return tie;
 	}
 }
 
