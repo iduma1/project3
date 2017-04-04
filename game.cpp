@@ -142,9 +142,10 @@ bool Game::checkWin() {
 		return false;
 	}
 	
-	if (temp == true && currentPlayer == 1) {
+	if (temp == true && currentPlayer == 0) {
 		return true;
-	} else if (temp == true && currentPlayer == 2) {
+	}
+	if (temp == true && currentPlayer == 1) {
 		return true;
 	}
 }
