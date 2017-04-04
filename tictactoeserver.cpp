@@ -163,12 +163,7 @@ state onePlayerFn(Game& game, Player player1, Player& player2) {
 	sendfifo.openwrite();					//open send fifo
 	
 	string boardState = game.getBoardState() + ",onePlayer";	
-	if (parseCommand(message) == "restartServer") {
-		sendfifo.send(boardState);				//send the boardstate
-		sendfifo.fifoclose();					//close send fifo
-		cout << "Sent: " << boardState << endl;
-		return noPlayer;	
-	} else if (parseCommand(message) != "playerRegister") {
+	if (parseCommand(message) != "playerRegister" || parseCommand(message) != "restartServer") {
 		sendfifo.send(boardState);				//send the boardstate
 		sendfifo.fifoclose();					//close send fifo
 		cout << "Sent: " << boardState << endl;
