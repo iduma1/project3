@@ -162,20 +162,21 @@ state onePlayerFn(Game& game, Player player1, Player& player2) {
 	player2.setPlayerName(player2Name);		//store player 1 name
 	sendfifo.openwrite();					//open send fifo
 	
-	string boardState = game.getBoardState() + ",onePlayer";	
-	if (parseCommand(message) != "playerRegister" || parseCommand(message) != "restartServer") {
-		sendfifo.send(boardState);				//send the boardstate
-		sendfifo.fifoclose();					//close send fifo
-		cout << "Sent: " << boardState << endl;
-		return onePlayer;
-	} else {
-	 	boardState = game.getBoardState() + "," + player1.getPlayerName();	
+	string boardState = game.getBoardState() + "," + player1.getPlayerName();
+	if (parseCommand(message) == "playerRegister" || parseCommand(message) == "restartServer") {
 		sendfifo.send(boardState);				//send the boardstate
 		sendfifo.fifoclose();					//close send fifo
 		cout << "Sent: " << boardState << endl;
 		return twoPlayer;
+	} else {
+		boardState = game.getBoardState() + ",onePlayer";
+	 	sendfifo.send(boardState);				//send the boardstate
+		sendfifo.fifoclose();					//close send fifo
+		cout << "Sent: " << boardState << endl;
+		return onePlayer;
 	}	
 }
+
 
 state twoPlayerFn(Game& game) {
 		
