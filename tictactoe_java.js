@@ -187,11 +187,12 @@ function DetectGameOver(boardState) {//Function checks if the boardState has a t
 
 
 function PlayAgain() {
-	//CallCGI("restartSever");
+	CallCGI("restartServer");
 	window.location.reload();
 }
 
 window.onbeforeunload = function(){
-	//CallCGI("restartServer");
+	
+	CallCGI("restartServer");
 	return 'Are you sure you want to leave?';
 }
