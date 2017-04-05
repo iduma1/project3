@@ -2,16 +2,12 @@
 
 using namespace std;
 
-//do u see me
-
 class Game {
 public:    
     Game();
-        
+    
     int getNumberOfMoves();
-    
-    Player getCurrentPlayer();
-    
+        
     int getCurrentPlayerValue();
     
     string getBoardState();
@@ -33,16 +29,10 @@ public:
     void nextTurn();
     
     void displayBoard();
-    
-    void addPlayer(Player p);
-    
-    void clearPlayers();
-    
+            
 private:        
     vector <char> tttBoard;
-    
-    vector <Player> players;
-    
+        
     int currentPlayer;
     
     int coord;

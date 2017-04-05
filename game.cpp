@@ -6,18 +6,9 @@
 
 Game::Game() {		 
     vector <char> tttBoard;
-    vector <Player> players;
     coord = 0;
     currentPlayer = 0;
     numberOfMoves = 0;
-}
-
-void Game::addPlayer(Player p) {
-	players.push_back(p);
-}
-
-void Game::clearPlayers() {
-	players.clear();
 }
 
 int Game::stringToInt(string message) {
@@ -102,10 +93,6 @@ void Game::nextTurn() {
 	}
 	numberOfMoves++;
 	//cout << "The value of currentPlayer is: " << currentPlayer << endl;
-}
-
-Player Game::getCurrentPlayer() {
-	return players[currentPlayer];
 }
 
 int Game::getCurrentPlayerValue() {
